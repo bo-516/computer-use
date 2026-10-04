@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "probe": {
+      "command": "python3",
+      "args": ["${GROK_PLUGIN_ROOT}/bin/probe_mcp.py", "probe"],
+      "env": {
+        "GROK_COMPUTER_PROBE_DATA": "${GROK_PLUGIN_DATA}",
+        "GROK_COMPUTER_PROBE_ROOT": "${GROK_PLUGIN_ROOT}"
+      }
+    },
+    "probe2": {
+      "command": "python3",
+      "args": ["${GROK_PLUGIN_ROOT}/bin/probe_mcp.py", "probe2"]
+    },
+    "probe_rootvar": {
+      "command": "python3",
+      "args": ["${GROK_PLUGIN_ROOT}/bin/probe_mcp.py", "probe_rootvar"]
+    }
+  }
+}

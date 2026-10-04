@@ -1,0 +1,8 @@
+{
+  "name": "computer-use-probe",
+  "version": "0.1.0",
+  "description": "Phase 0 probes for the computer-use plugin: hook payloads, MCP images, variable expansion, subagent and command behaviour",
+  "author": { "name": "Grok Computer contributors" },
+  "license": "Apache-2.0",
+  "keywords": ["computer-use", "phase0", "probe"]
+}
