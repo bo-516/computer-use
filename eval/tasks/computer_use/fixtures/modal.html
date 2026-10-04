@@ -1,0 +1,7 @@
+<!doctype html><html><head><title>Plans</title><!-- fixture-lib --></head><body>
+<h1>Plans</h1><p>Current title: <span id="cur">Q3 draft</span></p><button onclick="dlg.hidden = false">Edit</button>
+<div id="dlg" class="dialog" role="dialog" aria-label="Edit plan" hidden>
+<label>Title <input id="title" aria-label="Title" value="Q3 draft"></label>
+<button onclick="cur.textContent = title.value; dlg.hidden = true; record('title', title.value.trim())">Save</button>
+<button onclick="dlg.hidden = true">Cancel</button></div>
+</body></html>

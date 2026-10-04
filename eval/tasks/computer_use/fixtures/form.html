@@ -1,0 +1,19 @@
+<!doctype html><html><head><title>Profile</title><!-- fixture-lib --></head><body>
+<h1>Profile</h1>
+<label>Name <input id="name" aria-label="Name"></label>
+<label>Email <input id="email" aria-label="Email"></label><p id="err" role="alert"></p>
+<label>Birthday <input type="date" id="bday" aria-label="Birthday"></label>
+<fieldset><legend>Interests</legend>
+<label><input type="checkbox" value="A" aria-label="A"> A</label>
+<label><input type="checkbox" value="B" aria-label="B"> B</label>
+<label><input type="checkbox" value="C" aria-label="C"> C</label></fieldset>
+<button onclick="save()">Save profile</button>
+<script>
+function save() {
+  if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email.value.trim())) { err.textContent = "Please enter a valid email address."; return; }
+  err.textContent = "";
+  var picks = Array.prototype.filter.call(document.querySelectorAll("fieldset input"), function (b) { return b.checked; })
+    .map(function (b) { return b.value; });
+  record("profile", {name: name.value.trim(), email: email.value.trim(), birthday: bday.value, interests: picks});
+}
+</script></body></html>

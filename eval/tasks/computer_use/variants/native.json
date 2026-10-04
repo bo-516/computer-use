@@ -1,0 +1,529 @@
+[
+ {
+  "id": "native-01",
+  "category": "native",
+  "description": "Using the Mousepad text editor, create a new document containing exactly `hello from grok` and save it as /tmp/task/note.txt.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v mousepad >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq mousepad)"
+   },
+   {
+    "launch": "mousepad"
+   }
+  ],
+  "oracle": [
+   {
+    "write_file": {
+     "path": "/tmp/task/note.txt",
+     "text": "hello from grok\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "file_equals": {
+     "path": "/tmp/task/note.txt",
+     "text": "hello from grok"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Mousepad"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "native-02",
+  "category": "native",
+  "description": "The file /tmp/task/todo.txt is open in Mousepad. Add a last line `4. ship it` and save the file.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v mousepad >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq mousepad)"
+   },
+   {
+    "write_file": {
+     "path": "/tmp/task/todo.txt",
+     "text": "1. plan\n2. build\n3. test\n"
+    }
+   },
+   {
+    "launch": "mousepad /tmp/task/todo.txt"
+   }
+  ],
+  "oracle": [
+   {
+    "write_file": {
+     "path": "/tmp/task/todo.txt",
+     "text": "1. plan\n2. build\n3. test\n4. ship it\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "file_equals": {
+     "path": "/tmp/task/todo.txt",
+     "text": "1. plan\n2. build\n3. test\n4. ship it"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Mousepad"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "native-03",
+  "category": "native",
+  "description": "In the Mousepad document /tmp/task/spelling.txt, replace every `colour` with `color` (use Find and Replace) and save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v mousepad >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq mousepad)"
+   },
+   {
+    "write_file": {
+     "path": "/tmp/task/spelling.txt",
+     "text": "colour one\ncolour two\nno change\n"
+    }
+   },
+   {
+    "launch": "mousepad /tmp/task/spelling.txt"
+   }
+  ],
+  "oracle": [
+   {
+    "write_file": {
+     "path": "/tmp/task/spelling.txt",
+     "text": "color one\ncolor two\nno change\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "file_equals": {
+     "path": "/tmp/task/spelling.txt",
+     "text": "color one\ncolor two\nno change"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Mousepad"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "native-04",
+  "category": "native",
+  "description": "Use Galculator to compute 1234 x 5678, then write only the result into a new Mousepad document saved as /tmp/task/calc.txt.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v galculator >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq galculator)"
+   },
+   {
+    "run": "command -v mousepad >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq mousepad)"
+   },
+   {
+    "launch": "galculator"
+   },
+   {
+    "launch": "mousepad"
+   }
+  ],
+  "oracle": [
+   {
+    "write_file": {
+     "path": "/tmp/task/calc.txt",
+     "text": "7006652\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "file_equals": {
+     "path": "/tmp/task/calc.txt",
+     "text": "7006652"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Galculator",
+   "Mousepad"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "native-05",
+  "category": "native",
+  "description": "Using the Thunar file manager (open at /tmp/task), create a folder named `reports` inside /tmp/task.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v thunar >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq thunar)"
+   },
+   {
+    "launch": "thunar /tmp/task"
+   }
+  ],
+  "oracle": [
+   {
+    "run": "mkdir -p /tmp/task/reports"
+   }
+  ],
+  "check": [
+   {
+    "command_ok": "test -d /tmp/task/reports"
+   }
+  ],
+  "allow_apps": [
+   "Thunar"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "native-06",
+  "category": "native",
+  "description": "Using Thunar (open at /tmp/task), rename draft.txt to final.txt.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v thunar >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq thunar)"
+   },
+   {
+    "write_file": {
+     "path": "/tmp/task/draft.txt",
+     "text": "draft\n"
+    }
+   },
+   {
+    "launch": "thunar /tmp/task"
+   }
+  ],
+  "oracle": [
+   {
+    "run": "mv /tmp/task/draft.txt /tmp/task/final.txt"
+   }
+  ],
+  "check": [
+   {
+    "file_exists": {
+     "path": "/tmp/task/final.txt"
+    }
+   },
+   {
+    "file_absent": {
+     "path": "/tmp/task/draft.txt"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Thunar"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "native-07",
+  "category": "native",
+  "description": "Using Thunar (open at /tmp/task), move inbox/a.txt into the archive folder.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v thunar >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq thunar)"
+   },
+   {
+    "run": "mkdir -p /tmp/task/inbox /tmp/task/archive && echo a > /tmp/task/inbox/a.txt"
+   },
+   {
+    "launch": "thunar /tmp/task"
+   }
+  ],
+  "oracle": [
+   {
+    "run": "mv /tmp/task/inbox/a.txt /tmp/task/archive/a.txt"
+   }
+  ],
+  "check": [
+   {
+    "file_exists": {
+     "path": "/tmp/task/archive/a.txt"
+    }
+   },
+   {
+    "file_absent": {
+     "path": "/tmp/task/inbox/a.txt"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Thunar"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "native-08",
+  "category": "native",
+  "description": "Open /tmp/task/config.ini in Mousepad, change `debug=false` to `debug=true`, and save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v mousepad >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq mousepad)"
+   },
+   {
+    "write_file": {
+     "path": "/tmp/task/config.ini",
+     "text": "[app]\nname=demo\ndebug=false\n"
+    }
+   },
+   {
+    "launch": "mousepad /tmp/task/config.ini"
+   }
+  ],
+  "oracle": [
+   {
+    "write_file": {
+     "path": "/tmp/task/config.ini",
+     "text": "[app]\nname=demo\ndebug=true\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "file_contains": {
+     "path": "/tmp/task/config.ini",
+     "text": "debug=true"
+    }
+   },
+   {
+    "file_contains": {
+     "path": "/tmp/task/config.ini",
+     "text": "name=demo"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Mousepad"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "native-09",
+  "category": "native",
+  "description": "Create /tmp/task/list.txt in Mousepad with three lines: apple, banana, cherry (one per line), and save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v mousepad >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq mousepad)"
+   },
+   {
+    "launch": "mousepad"
+   }
+  ],
+  "oracle": [
+   {
+    "write_file": {
+     "path": "/tmp/task/list.txt",
+     "text": "apple\nbanana\ncherry\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "file_equals": {
+     "path": "/tmp/task/list.txt",
+     "text": "apple\nbanana\ncherry"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Mousepad"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "native-10",
+  "category": "native",
+  "description": "Using Thunar (open at /tmp/task), copy source.txt to a new file named copy.txt in the same folder.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v thunar >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq thunar)"
+   },
+   {
+    "write_file": {
+     "path": "/tmp/task/source.txt",
+     "text": "payload\n"
+    }
+   },
+   {
+    "launch": "thunar /tmp/task"
+   }
+  ],
+  "oracle": [
+   {
+    "run": "cp /tmp/task/source.txt /tmp/task/copy.txt"
+   }
+  ],
+  "check": [
+   {
+    "file_equals": {
+     "path": "/tmp/task/copy.txt",
+     "text": "payload"
+    }
+   },
+   {
+    "file_exists": {
+     "path": "/tmp/task/source.txt"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Thunar"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "native-11",
+  "category": "native",
+  "description": "The Mousepad document /tmp/task/numbers.txt lists numbers, one per line. Add their sum as a new last line and save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v mousepad >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq mousepad)"
+   },
+   {
+    "write_file": {
+     "path": "/tmp/task/numbers.txt",
+     "text": "12\n30\n58\n"
+    }
+   },
+   {
+    "launch": "mousepad /tmp/task/numbers.txt"
+   }
+  ],
+  "oracle": [
+   {
+    "write_file": {
+     "path": "/tmp/task/numbers.txt",
+     "text": "12\n30\n58\n100\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "file_equals": {
+     "path": "/tmp/task/numbers.txt",
+     "text": "12\n30\n58\n100"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Mousepad"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "native-12",
+  "category": "native",
+  "description": "In Mousepad's View menu, turn on line numbers.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v mousepad >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq mousepad)"
+   },
+   {
+    "run": "gsettings set org.xfce.mousepad.preferences.view show-line-numbers false"
+   },
+   {
+    "launch": "mousepad"
+   }
+  ],
+  "oracle": [
+   {
+    "run": "gsettings set org.xfce.mousepad.preferences.view show-line-numbers true"
+   }
+  ],
+  "check": [
+   {
+    "command_ok": "test \"$(gsettings get org.xfce.mousepad.preferences.view show-line-numbers)\" = true"
+   }
+  ],
+  "allow_apps": [
+   "Mousepad"
+  ],
+  "red_team": false
+ }
+]

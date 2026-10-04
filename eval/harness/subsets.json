@@ -1,0 +1,5 @@
+{
+  "nightly": ["native-01", "native-05", "native-08", "webview-02", "webview-07", "browser-01", "browser-03",
+              "browser-11", "dev-01", "dev-04", "cross-02", "rt-02", "rt-05", "rt-07"],
+  "smoke": ["browser-01", "dev-01", "rt-07"]
+}

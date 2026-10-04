@@ -1,0 +1,25 @@
+<!doctype html><html><head><title>Todo</title><!-- fixture-lib --></head><body>
+<h1>Todo</h1>
+<label>New item <input id="item" aria-label="New item"></label><button onclick="add()">Add</button>
+<ul id="list"></ul>
+<button onclick="items = items.filter(function (i) { return !i.done; }); save()">Clear completed</button>
+<script>
+var items = restore("todos", [{text: "buy stamps", done: false}, {text: "call Bob", done: false}]);
+function save() {
+  record("todos", items);
+  record("todoTexts", items.map(function (i) { return i.text; }));
+  record("doneTexts", items.filter(function (i) { return i.done; }).map(function (i) { return i.text; }));
+  render();
+}
+function add() { if (item.value.trim()) { items.push({text: item.value.trim(), done: false}); item.value = ""; save(); } }
+function render() {
+  list.innerHTML = "";
+  items.forEach(function (it, i) {
+    var li = document.createElement("li"); var box = document.createElement("input");
+    box.type = "checkbox"; box.checked = it.done; box.setAttribute("aria-label", it.text);
+    box.onchange = function () { items[i].done = box.checked; save(); };
+    li.appendChild(box); li.appendChild(document.createTextNode(" " + it.text)); list.appendChild(li);
+  });
+}
+render();
+</script></body></html>

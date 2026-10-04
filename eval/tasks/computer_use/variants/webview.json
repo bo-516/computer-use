@@ -1,0 +1,415 @@
+[
+ {
+  "id": "webview-01",
+  "category": "webview",
+  "description": "In the Settings window, turn Dark mode on.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "window": {
+     "fixture": "settings.html",
+     "title": "Settings"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Settings",
+     "key": "darkMode",
+     "value": true
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Settings",
+     "key": "darkMode",
+     "equals": true
+    }
+   }
+  ],
+  "allow_apps": [
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "webview-02",
+  "category": "webview",
+  "description": "In the Settings window, change the Display name to `Grok Tester` and click Save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "window": {
+     "fixture": "settings.html",
+     "title": "Settings"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Settings",
+     "key": "saved",
+     "value": {
+      "displayName": "Grok Tester",
+      "frequency": "Daily"
+     }
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Settings",
+     "key": "saved.displayName",
+     "equals": "Grok Tester"
+    }
+   }
+  ],
+  "allow_apps": [
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "webview-03",
+  "category": "webview",
+  "description": "In the Settings window, set Frequency to Weekly and click Save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "window": {
+     "fixture": "settings.html",
+     "title": "Settings"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Settings",
+     "key": "saved",
+     "value": {
+      "displayName": "Ana",
+      "frequency": "Weekly"
+     }
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Settings",
+     "key": "saved.frequency",
+     "equals": "Weekly"
+    }
+   }
+  ],
+  "allow_apps": [
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "webview-04",
+  "category": "webview",
+  "description": "In the Todo window, add three items: milk, eggs, bread.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "window": {
+     "fixture": "todo.html",
+     "title": "Todo"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Todo",
+     "key": "todoTexts",
+     "value": [
+      "buy stamps",
+      "call Bob",
+      "milk",
+      "eggs",
+      "bread"
+     ]
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Todo",
+     "key": "todoTexts",
+     "includes": [
+      "milk",
+      "eggs",
+      "bread"
+     ]
+    }
+   }
+  ],
+  "allow_apps": [
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "webview-05",
+  "category": "webview",
+  "description": "In the Todo window, mark `call Bob` as done.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "window": {
+     "fixture": "todo.html",
+     "title": "Todo"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Todo",
+     "key": "doneTexts",
+     "value": [
+      "call Bob"
+     ]
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Todo",
+     "key": "doneTexts",
+     "includes": [
+      "call Bob"
+     ]
+    }
+   }
+  ],
+  "allow_apps": [
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "webview-06",
+  "category": "webview",
+  "description": "In the Settings window, set Volume to about 70 (between 65 and 75).",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "window": {
+     "fixture": "settings.html",
+     "title": "Settings"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Settings",
+     "key": "volume",
+     "value": 70
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Settings",
+     "key": "volume",
+     "between": [
+      65,
+      75
+     ]
+    }
+   }
+  ],
+  "allow_apps": [
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "webview-07",
+  "category": "webview",
+  "description": "In the Settings window, open the Advanced tab and enable Experimental features.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "window": {
+     "fixture": "settings.html",
+     "title": "Settings"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Settings",
+     "key": "experimental",
+     "value": true
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Settings",
+     "key": "experimental",
+     "equals": true
+    }
+   }
+  ],
+  "allow_apps": [
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "webview-08",
+  "category": "webview",
+  "description": "In the Counter window, increment the counter until it shows 5.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "window": {
+     "fixture": "counter.html",
+     "title": "Counter"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Counter",
+     "key": "count",
+     "value": 5
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Counter",
+     "key": "count",
+     "equals": 5
+    }
+   }
+  ],
+  "allow_apps": [
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "webview-09",
+  "category": "webview",
+  "description": "In the Releases window, search for `beta` and open the `beta-release` result.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "window": {
+     "fixture": "search.html",
+     "title": "Releases"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Releases",
+     "key": "selected",
+     "value": "beta-release"
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Releases",
+     "key": "selected",
+     "equals": "beta-release"
+    }
+   }
+  ],
+  "allow_apps": [
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "webview-10",
+  "category": "webview",
+  "description": "In the Settings window, turn Notifications off.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "window": {
+     "fixture": "settings.html",
+     "title": "Settings"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Settings",
+     "key": "notifications",
+     "value": false
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Settings",
+     "key": "notifications",
+     "equals": false
+    }
+   }
+  ],
+  "allow_apps": [
+   "bench-ui"
+  ],
+  "red_team": false
+ }
+]

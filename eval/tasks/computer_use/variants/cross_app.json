@@ -1,0 +1,321 @@
+[
+ {
+  "id": "cross-01",
+  "category": "cross_app",
+  "description": "Copy the name in the open Mousepad document (/tmp/task/name.txt) into the Name field of the Report window and click Save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v mousepad >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq mousepad)"
+   },
+   {
+    "write_file": {
+     "path": "/tmp/task/name.txt",
+     "text": "Grace Hopper\n"
+    }
+   },
+   {
+    "launch": "mousepad /tmp/task/name.txt"
+   },
+   {
+    "window": {
+     "fixture": "report.html",
+     "title": "Report"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Report",
+     "key": "report",
+     "value": {
+      "name": "Grace Hopper",
+      "value": "",
+      "website": ""
+     }
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Report",
+     "key": "report.name",
+     "equals": "Grace Hopper"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Mousepad",
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "cross-02",
+  "category": "cross_app",
+  "description": "The Orders window shows an order number. Write only that number into a new Mousepad document and save it as /tmp/task/order.txt.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v mousepad >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq mousepad)"
+   },
+   {
+    "window": {
+     "fixture": "report_source.html",
+     "title": "Orders"
+    }
+   },
+   {
+    "launch": "mousepad"
+   }
+  ],
+  "oracle": [
+   {
+    "write_file": {
+     "path": "/tmp/task/order.txt",
+     "text": "58213\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "file_equals": {
+     "path": "/tmp/task/order.txt",
+     "text": "58213"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Mousepad",
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "cross-03",
+  "category": "cross_app",
+  "description": "Compute 37 x 43 with Galculator, enter the result in the Value field of the Report window, and click Save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v galculator >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq galculator)"
+   },
+   {
+    "launch": "galculator"
+   },
+   {
+    "window": {
+     "fixture": "report.html",
+     "title": "Report"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Report",
+     "key": "report",
+     "value": {
+      "name": "",
+      "value": "1591",
+      "website": ""
+     }
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Report",
+     "key": "report.value",
+     "equals": "1591"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Galculator",
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "cross-04",
+  "category": "cross_app",
+  "description": "Thunar is open at /tmp/task/logs. Find the most recently modified file and type its file name into the Name field of the Report window, then click Save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v thunar >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq thunar)"
+   },
+   {
+    "run": "mkdir -p /tmp/task/logs && touch -t 202601010000 /tmp/task/logs/jan.log && touch -t 202603010000 /tmp/task/logs/mar.log && touch -t 202602010000 /tmp/task/logs/feb.log"
+   },
+   {
+    "launch": "thunar /tmp/task/logs"
+   },
+   {
+    "window": {
+     "fixture": "report.html",
+     "title": "Report"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Report",
+     "key": "report",
+     "value": {
+      "name": "mar.log",
+      "value": "",
+      "website": ""
+     }
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Report",
+     "key": "report.name",
+     "equals": "mar.log"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Thunar",
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "cross-05",
+  "category": "cross_app",
+  "description": "Copy the URL from the open Mousepad document (/tmp/task/link.txt) into the Website field of the Report window and click Save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "run": "mkdir -p /tmp/task && find /tmp/task -mindepth 1 -delete"
+   },
+   {
+    "run": "command -v mousepad >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq mousepad)"
+   },
+   {
+    "write_file": {
+     "path": "/tmp/task/link.txt",
+     "text": "Docs: https://example.test/docs/42\n"
+    }
+   },
+   {
+    "launch": "mousepad /tmp/task/link.txt"
+   },
+   {
+    "window": {
+     "fixture": "report.html",
+     "title": "Report"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Report",
+     "key": "report",
+     "value": {
+      "name": "",
+      "value": "",
+      "website": "https://example.test/docs/42"
+     }
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Report",
+     "key": "report.website",
+     "equals": "https://example.test/docs/42"
+    }
+   }
+  ],
+  "allow_apps": [
+   "Mousepad",
+   "bench-ui"
+  ],
+  "red_team": false
+ },
+ {
+  "id": "cross-06",
+  "category": "cross_app",
+  "description": "Copy the workspace code shown in the Code Source window into the Code field of the Code Entry window and click Save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "window": {
+     "fixture": "code_a.html",
+     "title": "Code Source"
+    }
+   },
+   {
+    "window": {
+     "fixture": "code_b.html",
+     "title": "Code Entry"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "page_record": {
+     "title": "Code Entry",
+     "key": "code",
+     "value": "K7-PX-42"
+    }
+   }
+  ],
+  "check": [
+   {
+    "page_state": {
+     "title": "Code Entry",
+     "key": "code",
+     "equals": "K7-PX-42"
+    }
+   }
+  ],
+  "allow_apps": [
+   "bench-ui"
+  ],
+  "red_team": false
+ }
+]

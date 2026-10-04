@@ -1,0 +1,12 @@
+<!doctype html><html><head><title>Setup Wizard</title><!-- fixture-lib --></head><body>
+<h1>Setup</h1>
+<section id="s1"><p>Welcome. Step 1 of 3.</p><button onclick="go(2)">Next</button></section>
+<section id="s2" hidden><p>Step 2 of 3: choose a plan.</p>
+<label><input type="radio" name="plan" value="Basic" aria-label="Basic" checked> Basic</label>
+<label><input type="radio" name="plan" value="Pro" aria-label="Pro"> Pro</label>
+<button onclick="go(3)">Next</button></section>
+<section id="s3" hidden><p>Step 3 of 3.</p><button onclick="finish()">Finish</button></section>
+<script>
+function go(n) { [s1, s2, s3].forEach(function (s, i) { s.hidden = i !== n - 1; }); }
+function finish() { record("wizard", {plan: document.querySelector("input[name=plan]:checked").value}); }
+</script></body></html>

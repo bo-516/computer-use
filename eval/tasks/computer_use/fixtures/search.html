@@ -1,0 +1,14 @@
+<!doctype html><html><head><title>Releases</title><!-- fixture-lib --></head><body>
+<h1>Releases</h1><label>Search releases <input id="q" aria-label="Search releases" oninput="filter()"></label>
+<div id="results"></div>
+<script>
+var names = ["alpha-release", "beta-release", "beta-hotfix", "gamma-preview"];
+function filter() {
+  results.innerHTML = "";
+  names.filter(function (n) { return n.indexOf(q.value.toLowerCase()) >= 0; }).forEach(function (n) {
+    var b = document.createElement("button"); b.textContent = n; b.onclick = function () { record("selected", n); };
+    results.appendChild(b);
+  });
+}
+filter();
+</script></body></html>

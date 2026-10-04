@@ -1,0 +1,25 @@
+<meta charset="utf-8">
+<style>
+body{font-family:-apple-system,"Segoe UI",Ubuntu,sans-serif;margin:24px;font-size:15px;color:#222}
+button{font-size:15px;padding:6px 14px;margin:4px}
+input,select{font-size:15px;padding:4px;margin:4px}
+label{display:block;margin:8px 0}
+.dialog{border:2px solid #444;padding:16px;margin:16px 0;background:#fff8e1}
+.note{color:#555;font-size:13px}
+</style>
+<script>
+window.__state = {};
+function record(key, value) {
+  window.__state[key] = value;
+  try { localStorage.setItem("fx:" + key, JSON.stringify(value)); } catch (e) {}
+  if (location.protocol.indexOf("http") === 0) {
+    fetch("/state/" + encodeURIComponent(key), {method: "POST",
+      headers: {"Content-Type": "application/json"}, body: JSON.stringify(value)})
+      .catch(function () {});
+  }
+}
+function restore(key, fallback) {
+  try { var v = localStorage.getItem("fx:" + key); return v === null ? fallback : JSON.parse(v); }
+  catch (e) { return fallback; }
+}
+</script>

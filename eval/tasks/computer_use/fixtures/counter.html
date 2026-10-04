@@ -1,0 +1,5 @@
+<!doctype html><html><head><title>Counter</title><!-- fixture-lib --></head><body>
+<h1>Counter</h1><p>Count: <output id="count" aria-label="Count">0</output></p>
+<button onclick="n += 1; update()">Increment</button><button onclick="n = 0; update()">Reset</button>
+<script>var n = 0; function update() { count.textContent = n; record("count", n); }</script>
+</body></html>

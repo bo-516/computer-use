@@ -1,0 +1,472 @@
+[
+ {
+  "id": "dev-01",
+  "category": "dev_loop",
+  "description": "The web app in /tmp/grok-eval/devloop/dev-01 is served at http://127.0.0.1:8765/devloop/dev-01/. The save button is labelled 'Svae' instead of 'Save'. Fix the code in /tmp/grok-eval/devloop/dev-01/logic.js, then delegate a check to the computer subagent to confirm the fix in the browser. Finish when `node /tmp/grok-eval/devloop/dev-01/check.js` passes.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_run": "rm -rf /tmp/grok-eval/devloop/dev-01 && mkdir -p /tmp/grok-eval/devloop/dev-01"
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-01/logic.js",
+     "text": "(function (root) {\n  var api = {\n    saveLabel: function () { return 'Svae'; }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-01/index.html",
+     "text": "<!doctype html><html><head><title>Editor</title><meta charset='utf-8'><script src='logic.js'></script></head><body><h1>Editor</h1><button id='b'></button><script>b.textContent = app.saveLabel();</script></body></html>\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-01/check.js",
+     "text": "const assert = require('assert');\nconst app = require('./logic.js');\nassert.strictEqual(app.saveLabel(), 'Save');\nconsole.log('ok');\n"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-01/logic.js",
+     "text": "(function (root) {\n  var api = {\n    saveLabel: function () { return 'Save'; }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_command_ok": "node /tmp/grok-eval/devloop/dev-01/check.js"
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "dev-02",
+  "category": "dev_loop",
+  "description": "The web app in /tmp/grok-eval/devloop/dev-02 is served at http://127.0.0.1:8765/devloop/dev-02/. Each click on Increment adds 2 instead of 1. Fix the code in /tmp/grok-eval/devloop/dev-02/logic.js, then delegate a check to the computer subagent to confirm the fix in the browser. Finish when `node /tmp/grok-eval/devloop/dev-02/check.js` passes.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_run": "rm -rf /tmp/grok-eval/devloop/dev-02 && mkdir -p /tmp/grok-eval/devloop/dev-02"
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-02/logic.js",
+     "text": "(function (root) {\n  var api = {\n    increment: function (n) { return n + 2; }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-02/index.html",
+     "text": "<!doctype html><html><head><title>Counter</title><meta charset='utf-8'><script src='logic.js'></script></head><body><h1>Counter</h1><p>Count: <span id='c'>0</span></p><button onclick='c.textContent = app.increment(Number(c.textContent))'>Increment</button></body></html>\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-02/check.js",
+     "text": "const assert = require('assert');\nconst app = require('./logic.js');\nassert.strictEqual(app.increment(0), 1); assert.strictEqual(app.increment(4), 5);\nconsole.log('ok');\n"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-02/logic.js",
+     "text": "(function (root) {\n  var api = {\n    increment: function (n) { return n + 1; }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_command_ok": "node /tmp/grok-eval/devloop/dev-02/check.js"
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "dev-03",
+  "category": "dev_loop",
+  "description": "The web app in /tmp/grok-eval/devloop/dev-03 is served at http://127.0.0.1:8765/devloop/dev-03/. Email addresses with a plus sign such as a+b@x.io are rejected. Fix the code in /tmp/grok-eval/devloop/dev-03/logic.js, then delegate a check to the computer subagent to confirm the fix in the browser. Finish when `node /tmp/grok-eval/devloop/dev-03/check.js` passes.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_run": "rm -rf /tmp/grok-eval/devloop/dev-03 && mkdir -p /tmp/grok-eval/devloop/dev-03"
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-03/logic.js",
+     "text": "(function (root) {\n  var api = {\n    isValidEmail: function (s) { return /^[a-z0-9.]+@[a-z0-9.]+\\.[a-z]{2,}$/i.test(s); }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-03/index.html",
+     "text": "<!doctype html><html><head><title>Signup</title><meta charset='utf-8'><script src='logic.js'></script></head><body><h1>Signup</h1><input id='e' aria-label='Email'><button onclick='r.textContent = app.isValidEmail(e.value) ? \"valid\" : \"invalid\"'>Check</button><p id='r'></p></body></html>\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-03/check.js",
+     "text": "const assert = require('assert');\nconst app = require('./logic.js');\nassert.ok(app.isValidEmail('a+b@x.io')); assert.ok(!app.isValidEmail('nope'));\nconsole.log('ok');\n"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-03/logic.js",
+     "text": "(function (root) {\n  var api = {\n    isValidEmail: function (s) { return /^[a-z0-9.+_-]+@[a-z0-9.-]+\\.[a-z]{2,}$/i.test(s); }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_command_ok": "node /tmp/grok-eval/devloop/dev-03/check.js"
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "dev-04",
+  "category": "dev_loop",
+  "description": "The web app in /tmp/grok-eval/devloop/dev-04 is served at http://127.0.0.1:8765/devloop/dev-04/. The total ignores the 8% tax. Fix the code in /tmp/grok-eval/devloop/dev-04/logic.js, then delegate a check to the computer subagent to confirm the fix in the browser. Finish when `node /tmp/grok-eval/devloop/dev-04/check.js` passes.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_run": "rm -rf /tmp/grok-eval/devloop/dev-04 && mkdir -p /tmp/grok-eval/devloop/dev-04"
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-04/logic.js",
+     "text": "(function (root) {\n  var api = {\n    totalWithTax: function (subtotal) { return subtotal; }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-04/index.html",
+     "text": "<!doctype html><html><head><title>Checkout</title><meta charset='utf-8'><script src='logic.js'></script></head><body><h1>Checkout</h1><p>Subtotal 100.00, total: <span id='t'></span></p><script>t.textContent = app.totalWithTax(100).toFixed(2);</script></body></html>\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-04/check.js",
+     "text": "const assert = require('assert');\nconst app = require('./logic.js');\nassert.strictEqual(app.totalWithTax(100), 108); assert.strictEqual(app.totalWithTax(10), 10.8);\nconsole.log('ok');\n"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-04/logic.js",
+     "text": "(function (root) {\n  var api = {\n    totalWithTax: function (subtotal) { return Math.round(subtotal * 108) / 100; }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_command_ok": "node /tmp/grok-eval/devloop/dev-04/check.js"
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "dev-05",
+  "category": "dev_loop",
+  "description": "The web app in /tmp/grok-eval/devloop/dev-05 is served at http://127.0.0.1:8765/devloop/dev-05/. Clear completed removes every item, not just completed ones. Fix the code in /tmp/grok-eval/devloop/dev-05/logic.js, then delegate a check to the computer subagent to confirm the fix in the browser. Finish when `node /tmp/grok-eval/devloop/dev-05/check.js` passes.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_run": "rm -rf /tmp/grok-eval/devloop/dev-05 && mkdir -p /tmp/grok-eval/devloop/dev-05"
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-05/logic.js",
+     "text": "(function (root) {\n  var api = {\n    clearCompleted: function (items) { return []; }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-05/index.html",
+     "text": "<!doctype html><html><head><title>Todo</title><meta charset='utf-8'><script src='logic.js'></script></head><body><h1>Todo</h1><p>2 open, 1 done</p><button onclick='r.textContent = app.clearCompleted([{done:false},{done:true},{done:false}]).length'>Clear completed</button><p>Remaining: <span id='r'></span></p></body></html>\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-05/check.js",
+     "text": "const assert = require('assert');\nconst app = require('./logic.js');\nassert.strictEqual(app.clearCompleted([{done:false},{done:true}]).length, 1);\nconsole.log('ok');\n"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-05/logic.js",
+     "text": "(function (root) {\n  var api = {\n    clearCompleted: function (items) { return items.filter(function (i) { return !i.done; }); }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_command_ok": "node /tmp/grok-eval/devloop/dev-05/check.js"
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "dev-06",
+  "category": "dev_loop",
+  "description": "The web app in /tmp/grok-eval/devloop/dev-06 is served at http://127.0.0.1:8765/devloop/dev-06/. Continue stays blocked when Name and Email are filled (it also wants a phone field the form does not have). Fix the code in /tmp/grok-eval/devloop/dev-06/logic.js, then delegate a check to the computer subagent to confirm the fix in the browser. Finish when `node /tmp/grok-eval/devloop/dev-06/check.js` passes.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_run": "rm -rf /tmp/grok-eval/devloop/dev-06 && mkdir -p /tmp/grok-eval/devloop/dev-06"
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-06/logic.js",
+     "text": "(function (root) {\n  var api = {\n    canContinue: function (f) { return !!(f.name && f.email && f.phone); }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-06/index.html",
+     "text": "<!doctype html><html><head><title>Form</title><meta charset='utf-8'><script src='logic.js'></script></head><body><h1>Form</h1><input id='n' aria-label='Name'><input id='m' aria-label='Email'><button onclick='r.textContent = app.canContinue({name: n.value, email: m.value}) ? \"ok\" : \"blocked\"'>Continue</button><p id='r'></p></body></html>\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-06/check.js",
+     "text": "const assert = require('assert');\nconst app = require('./logic.js');\nassert.ok(app.canContinue({name: 'a', email: 'b'})); assert.ok(!app.canContinue({name: 'a'}));\nconsole.log('ok');\n"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-06/logic.js",
+     "text": "(function (root) {\n  var api = {\n    canContinue: function (f) { return !!(f.name && f.email); }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_command_ok": "node /tmp/grok-eval/devloop/dev-06/check.js"
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "dev-07",
+  "category": "dev_loop",
+  "description": "The web app in /tmp/grok-eval/devloop/dev-07 is served at http://127.0.0.1:8765/devloop/dev-07/. Dates must read like '03 Oct 2026' but show 'Oct 03 2026'. Fix the code in /tmp/grok-eval/devloop/dev-07/logic.js, then delegate a check to the computer subagent to confirm the fix in the browser. Finish when `node /tmp/grok-eval/devloop/dev-07/check.js` passes.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_run": "rm -rf /tmp/grok-eval/devloop/dev-07 && mkdir -p /tmp/grok-eval/devloop/dev-07"
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-07/logic.js",
+     "text": "(function (root) {\n  var api = {\n    formatDate: function (iso) { var p = iso.split('-'); var m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(p[1]) - 1]; return m + ' ' + p[2] + ' ' + p[0]; }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-07/index.html",
+     "text": "<!doctype html><html><head><title>Dates</title><meta charset='utf-8'><script src='logic.js'></script></head><body><h1>Dates</h1><p>Release date: <span id='d'></span></p><script>d.textContent = app.formatDate('2026-10-03');</script></body></html>\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-07/check.js",
+     "text": "const assert = require('assert');\nconst app = require('./logic.js');\nassert.strictEqual(app.formatDate('2026-10-03'), '03 Oct 2026');\nconsole.log('ok');\n"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-07/logic.js",
+     "text": "(function (root) {\n  var api = {\n    formatDate: function (iso) { var p = iso.split('-'); var m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(p[1]) - 1]; return p[2] + ' ' + m + ' ' + p[0]; }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_command_ok": "node /tmp/grok-eval/devloop/dev-07/check.js"
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "dev-08",
+  "category": "dev_loop",
+  "description": "The web app in /tmp/grok-eval/devloop/dev-08 is served at http://127.0.0.1:8765/devloop/dev-08/. Search is case-sensitive; 'alpha' should find 'Alpha'. Fix the code in /tmp/grok-eval/devloop/dev-08/logic.js, then delegate a check to the computer subagent to confirm the fix in the browser. Finish when `node /tmp/grok-eval/devloop/dev-08/check.js` passes.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_run": "rm -rf /tmp/grok-eval/devloop/dev-08 && mkdir -p /tmp/grok-eval/devloop/dev-08"
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-08/logic.js",
+     "text": "(function (root) {\n  var api = {\n    search: function (items, q) { return items.filter(function (i) { return i.indexOf(q) >= 0; }); }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-08/index.html",
+     "text": "<!doctype html><html><head><title>Search</title><meta charset='utf-8'><script src='logic.js'></script></head><body><h1>Search</h1><input id='q' aria-label='Search'><button onclick='r.textContent = app.search([\"Alpha\",\"beta\"], q.value).join(\", \")'>Search</button><p id='r'></p></body></html>\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-08/check.js",
+     "text": "const assert = require('assert');\nconst app = require('./logic.js');\nassert.deepStrictEqual(app.search(['Alpha', 'beta'], 'alpha'), ['Alpha']);\nconsole.log('ok');\n"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-08/logic.js",
+     "text": "(function (root) {\n  var api = {\n    search: function (items, q) { return items.filter(function (i) { return i.toLowerCase().indexOf(q.toLowerCase()) >= 0; }); }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_command_ok": "node /tmp/grok-eval/devloop/dev-08/check.js"
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "dev-09",
+  "category": "dev_loop",
+  "description": "The web app in /tmp/grok-eval/devloop/dev-09 is served at http://127.0.0.1:8765/devloop/dev-09/. Page 1 skips the first items (pages are 1-based). Fix the code in /tmp/grok-eval/devloop/dev-09/logic.js, then delegate a check to the computer subagent to confirm the fix in the browser. Finish when `node /tmp/grok-eval/devloop/dev-09/check.js` passes.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_run": "rm -rf /tmp/grok-eval/devloop/dev-09 && mkdir -p /tmp/grok-eval/devloop/dev-09"
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-09/logic.js",
+     "text": "(function (root) {\n  var api = {\n    pageItems: function (items, page, size) { return items.slice(page * size, page * size + size); }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-09/index.html",
+     "text": "<!doctype html><html><head><title>Pages</title><meta charset='utf-8'><script src='logic.js'></script></head><body><h1>Pages</h1><p>Page 1: <span id='p'></span></p><script>p.textContent = app.pageItems([1,2,3,4,5], 1, 2).join(', ');</script></body></html>\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-09/check.js",
+     "text": "const assert = require('assert');\nconst app = require('./logic.js');\nassert.deepStrictEqual(app.pageItems([1,2,3,4,5], 1, 2), [1, 2]); assert.deepStrictEqual(app.pageItems([1,2,3,4,5], 3, 2), [5]);\nconsole.log('ok');\n"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-09/logic.js",
+     "text": "(function (root) {\n  var api = {\n    pageItems: function (items, page, size) { return items.slice((page - 1) * size, page * size); }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_command_ok": "node /tmp/grok-eval/devloop/dev-09/check.js"
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "dev-10",
+  "category": "dev_loop",
+  "description": "The web app in /tmp/grok-eval/devloop/dev-10 is served at http://127.0.0.1:8765/devloop/dev-10/. The Dark mode setting is not remembered after a reload. Fix the code in /tmp/grok-eval/devloop/dev-10/logic.js, then delegate a check to the computer subagent to confirm the fix in the browser. Finish when `node /tmp/grok-eval/devloop/dev-10/check.js` passes.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_run": "rm -rf /tmp/grok-eval/devloop/dev-10 && mkdir -p /tmp/grok-eval/devloop/dev-10"
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-10/logic.js",
+     "text": "(function (root) {\n  var api = {\n    saveKey: function () { return 'dark-mode'; },\n    loadKey: function () { return 'darkMode'; }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-10/index.html",
+     "text": "<!doctype html><html><head><title>Preferences</title><meta charset='utf-8'><script src='logic.js'></script></head><body><h1>Preferences</h1><label><input type='checkbox' id='d' aria-label='Dark mode' onchange='localStorage.setItem(app.saveKey(), d.checked)'> Dark mode</label><script>d.checked = localStorage.getItem(app.loadKey()) === 'true';</script></body></html>\n"
+    }
+   },
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-10/check.js",
+     "text": "const assert = require('assert');\nconst app = require('./logic.js');\nassert.strictEqual(app.saveKey(), app.loadKey());\nconsole.log('ok');\n"
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_write": {
+     "path": "/tmp/grok-eval/devloop/dev-10/logic.js",
+     "text": "(function (root) {\n  var api = {\n    saveKey: function () { return 'darkMode'; },\n    loadKey: function () { return 'darkMode'; }\n  };\n  if (typeof module !== 'undefined') { module.exports = api; } else { root.app = api; }\n})(this);\n"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_command_ok": "node /tmp/grok-eval/devloop/dev-10/check.js"
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ }
+]

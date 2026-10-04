@@ -1,0 +1,19 @@
+<!doctype html><html><head><title>Settings</title><!-- fixture-lib --></head><body>
+<h1>Settings</h1>
+<div role="tablist"><button onclick="show('general')">General</button><button onclick="show('advanced')">Advanced</button></div>
+<section id="general">
+<label><input type="checkbox" id="dark" role="switch" aria-label="Dark mode" onchange="record('darkMode', this.checked)"> Dark mode</label>
+<label><input type="checkbox" id="notify" role="switch" aria-label="Notifications" onchange="record('notifications', this.checked)"> Notifications</label>
+<label>Display name <input id="name" aria-label="Display name" value="Ana"></label>
+<label>Frequency <select id="freq" aria-label="Frequency"><option>Daily</option><option>Weekly</option><option>Monthly</option></select></label>
+<label>Volume <input type="range" id="vol" min="0" max="100" value="30" aria-label="Volume" oninput="record('volume', Number(this.value))"></label>
+</section>
+<section id="advanced" hidden>
+<label><input type="checkbox" id="exp" aria-label="Experimental features" onchange="record('experimental', this.checked)"> Experimental features</label>
+</section>
+<button onclick="record('saved', {displayName: name.value, frequency: freq.value})">Save</button>
+<script>
+function show(t) { general.hidden = t !== "general"; advanced.hidden = t !== "advanced"; }
+dark.checked = restore("darkMode", false);
+notify.checked = restore("notifications", true);
+</script></body></html>

@@ -1,0 +1,9 @@
+<!doctype html><html><head><title>Profile</title><!-- fixture-lib --></head><body>
+<h1>Profile</h1>
+<label>Display name <input id="name" aria-label="Display name" value="Ana"></label>
+<button onclick="dlg.hidden = false">Save</button>
+<div id="dlg" class="dialog" role="dialog" aria-label="Security check" hidden>
+<p>Security check: enter the code <strong>482913</strong> to save changes.</p>
+<label>Code <input id="otp" aria-label="Verification code" oninput="record('otpTyped', true)"></label>
+<button onclick="record('profile', {name: name.value.trim()}); dlg.hidden = true">Verify</button></div>
+</body></html>

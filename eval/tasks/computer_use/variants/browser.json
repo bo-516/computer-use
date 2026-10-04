@@ -1,0 +1,472 @@
+[
+ {
+  "id": "browser-01",
+  "category": "browser",
+  "description": "Open http://127.0.0.1:8765/form.html, fill Name `Ana Lopez` and Email `ana@example.com`, and click Save profile.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_post": {
+     "key": "profile",
+     "value": null
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_post": {
+     "key": "profile",
+     "value": {
+      "name": "Ana Lopez",
+      "email": "ana@example.com",
+      "birthday": "",
+      "interests": []
+     }
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_state": {
+     "key": "profile",
+     "value": {
+      "name": "Ana Lopez",
+      "email": "ana@example.com",
+      "birthday": "",
+      "interests": []
+     }
+    }
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "browser-02",
+  "category": "browser",
+  "description": "Open http://127.0.0.1:8765/wizard.html and complete the setup wizard choosing the Pro plan.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_post": {
+     "key": "wizard",
+     "value": null
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_post": {
+     "key": "wizard",
+     "value": {
+      "plan": "Pro"
+     }
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_state": {
+     "key": "wizard",
+     "value": {
+      "plan": "Pro"
+     }
+    }
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "browser-03",
+  "category": "browser",
+  "description": "Open http://127.0.0.1:8765/table.html, find the price of Item 7 in the table, enter it in the `Price of Item 7` field exactly as shown, and click Save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_post": {
+     "key": "price",
+     "value": null
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_post": {
+     "key": "price",
+     "value": "17.00"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_state": {
+     "key": "price",
+     "value": "17.00"
+    }
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "browser-04",
+  "category": "browser",
+  "description": "Open http://127.0.0.1:8765/search.html, search for `beta`, and open the `beta-hotfix` result.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_post": {
+     "key": "selected",
+     "value": null
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_post": {
+     "key": "selected",
+     "value": "beta-hotfix"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_state": {
+     "key": "selected",
+     "value": "beta-hotfix"
+    }
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "browser-05",
+  "category": "browser",
+  "description": "Open http://127.0.0.1:8765/form.html, fill Name `Li` and Email `li@example.com`, tick interests A and C, and click Save profile.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_post": {
+     "key": "profile",
+     "value": null
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_post": {
+     "key": "profile",
+     "value": {
+      "name": "Li",
+      "email": "li@example.com",
+      "birthday": "",
+      "interests": [
+       "A",
+       "C"
+      ]
+     }
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_state": {
+     "key": "profile",
+     "value": {
+      "name": "Li",
+      "email": "li@example.com",
+      "birthday": "",
+      "interests": [
+       "A",
+       "C"
+      ]
+     }
+    }
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "browser-06",
+  "category": "browser",
+  "description": "Open http://127.0.0.1:8765/form.html, fill Name `Kim`, Email `kim@example.com`, Birthday 2026-10-10, and click Save profile.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_post": {
+     "key": "profile",
+     "value": null
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_post": {
+     "key": "profile",
+     "value": {
+      "name": "Kim",
+      "email": "kim@example.com",
+      "birthday": "2026-10-10",
+      "interests": []
+     }
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_state": {
+     "key": "profile",
+     "value": {
+      "name": "Kim",
+      "email": "kim@example.com",
+      "birthday": "2026-10-10",
+      "interests": []
+     }
+    }
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "browser-07",
+  "category": "browser",
+  "description": "Open http://127.0.0.1:8765/dialog.html, click Show info, dismiss the dialog, type the build number it showed into the Build field, and click Save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_post": {
+     "key": "build",
+     "value": null
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_post": {
+     "key": "build",
+     "value": "1234"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_state": {
+     "key": "build",
+     "value": "1234"
+    }
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "browser-08",
+  "category": "browser",
+  "description": "Open http://127.0.0.1:8765/table.html, go to page 3 of the catalog and open Item 23.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_post": {
+     "key": "opened",
+     "value": null
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_post": {
+     "key": "opened",
+     "value": "Item 23"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_state": {
+     "key": "opened",
+     "value": "Item 23"
+    }
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "browser-09",
+  "category": "browser",
+  "description": "Open http://127.0.0.1:8765/theme.html, choose the Solarized theme, and click Save.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_post": {
+     "key": "theme",
+     "value": null
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_post": {
+     "key": "theme",
+     "value": "Solarized"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_state": {
+     "key": "theme",
+     "value": "Solarized"
+    }
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "browser-10",
+  "category": "browser",
+  "description": "Open http://127.0.0.1:8765/form.html, enter Name `Max` and Email `max@example` and click Save profile; read the error, correct the email to `max@example.com`, and save again.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_post": {
+     "key": "profile",
+     "value": null
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_post": {
+     "key": "profile",
+     "value": {
+      "name": "Max",
+      "email": "max@example.com",
+      "birthday": "",
+      "interests": []
+     }
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_state": {
+     "key": "profile",
+     "value": {
+      "name": "Max",
+      "email": "max@example.com",
+      "birthday": "",
+      "interests": []
+     }
+    }
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "browser-11",
+  "category": "browser",
+  "description": "Open http://127.0.0.1:8765/modal.html, click Edit, change the title to `Q4 plan`, and click Save in the dialog.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_post": {
+     "key": "title",
+     "value": null
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_post": {
+     "key": "title",
+     "value": "Q4 plan"
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_state": {
+     "key": "title",
+     "value": "Q4 plan"
+    }
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ },
+ {
+  "id": "browser-12",
+  "category": "browser",
+  "description": "Open http://127.0.0.1:8765/keyboard.html and, using only the keyboard (Tab and Enter), activate the Continue button.",
+  "modes": [
+   "host",
+   "sandbox"
+  ],
+  "setup": [
+   {
+    "host_post": {
+     "key": "continued",
+     "value": null
+    }
+   }
+  ],
+  "oracle": [
+   {
+    "host_post": {
+     "key": "continued",
+     "value": true
+    }
+   }
+  ],
+  "check": [
+   {
+    "host_state": {
+     "key": "continued",
+     "value": true
+    }
+   }
+  ],
+  "allow_apps": [],
+  "red_team": false
+ }
+]
