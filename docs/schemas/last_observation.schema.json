@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/bo-516/computer-use/docs/schemas/last_observation.schema.json",
+  "title": "last_observation.json (facade -> hooks contract, goal.md A.10)",
+  "description": "Written atomically by grok-computer-mcp after every observation and action; read by the guard (PreToolUse) and the verify gate (SubagentStop). All coordinates are image pixels of the observation (origin top-left). Size <= 64 KB.",
+  "type": "object",
+  "required": ["schema_version", "updated_at", "observation_id", "app", "elements", "marks", "focused", "last_hit", "last_action_at", "last_observe_at"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "updated_at": { "type": "number", "description": "Unix time of this write." },
+    "observation_id": { "type": "string", "pattern": "^obs_[0-9a-f]+$" },
+    "app": { "type": "string" },
+    "pid": { "type": ["integer", "null"] },
+    "window_id": { "type": ["integer", "string", "null"] },
+    "window_title": { "type": "string" },
+    "window_unsaved": { "type": "boolean" },
+    "scope": { "enum": ["window", "screen"] },
+    "image": {
+      "type": "array",
+      "prefixItems": [{ "type": "integer", "minimum": 1 }, { "type": "integer", "minimum": 1 }],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "elements": {
+      "type": "object",
+      "description": "Interactive elements of the observation, keyed by ref.",
+      "propertyNames": { "pattern": "^e[0-9]+$" },
+      "additionalProperties": { "$ref": "#/$defs/element" }
+    },
+    "marks": {
+      "type": "object",
+      "description": "Set-of-Mark numbers of the observation, keyed by the mark number as a string.",
+      "propertyNames": { "pattern": "^[0-9]+$" },
+      "additionalProperties": { "$ref": "#/$defs/element" }
+    },
+    "focused": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/element" }] },
+    "last_hit": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "allOf": [
+            { "$ref": "#/$defs/element" },
+            {
+              "type": "object",
+              "required": ["point"],
+              "properties": {
+                "point": {
+                  "type": "array",
+                  "prefixItems": [{ "type": "number" }, { "type": "number" }],
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "last_action_at": { "type": ["number", "null"] },
+    "last_observe_at": { "type": ["number", "null"] },
+    "last_screenshot_path": { "type": ["string", "null"] },
+    "last_screenshot_at": { "type": ["number", "null"] }
+  },
+  "$defs": {
+    "element": {
+      "type": "object",
+      "required": ["role", "label", "app"],
+      "properties": {
+        "ref": { "type": "string" },
+        "role": { "type": "string" },
+        "label": { "type": "string", "maxLength": 200 },
+        "app": { "type": "string" },
+        "bbox": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 4,
+          "maxItems": 4,
+          "description": "[x, y, width, height] in image pixels."
+        },
+        "secure": { "type": "boolean" },
+        "in_form": { "type": "boolean" },
+        "point": { "type": "array" }
+      }
+    }
+  }
+}
