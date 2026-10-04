@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Local evaluation outputs (traces and screenshots stay local, AGENTS.md)
+eval/grounding/data/synthetic/
+grounding-run/
+.probe-logs/
+
+# Generated per probe run
+eval/phase0/probe-plugin/assets/*.jpg
+eval/phase0/probe-plugin/assets/codes.json
+
+# OS
+.DS_Store

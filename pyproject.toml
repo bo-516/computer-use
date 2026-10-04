@@ -1,0 +1,94 @@
+[project]
+name = "grok-computer"
+version = "0.2.0"
+description = "Development workspace for the Grok Build computer-use plugin and the grok-computer-mcp facade"
+requires-python = ">=3.11"
+dependencies = ["grok-computer-mcp"]
+
+[dependency-groups]
+dev = [
+    "jsonschema==4.26.0",
+    "pyright==1.1.414",
+    "pytest==9.1.1",
+    "ruff==0.16.10",
+]
+
+[tool.uv]
+# The workspace root is a development harness, not a distributable package.
+package = false
+
+[tool.uv.workspace]
+members = ["servers/grok-computer-mcp"]
+
+[tool.uv.sources]
+grok-computer-mcp = { workspace = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "servers/grok-computer-mcp/tests", "eval"]
+python_files = ["test_*.py"]
+addopts = "-ra --strict-markers --import-mode=importlib"
+markers = [
+    "slow: exercises subprocesses or timing budgets",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".venv", "eval/grounding/data"]
+
+# The hooks and their tests must run on Python 3.8 (AGENTS.md): keep pyupgrade from rewriting
+# runtime typing constructs into 3.9+ syntax there.
+per-file-target-version = { "plugins/**/*.py" = "py38", "tests/hooks/**/*.py" = "py38", "servers/grok-computer-mcp/src/grok_computer_mcp/hooklib/**/*.py" = "py38", "eval/phase0/probe-plugin/**/*.py" = "py38" }
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PTH", "ANN", "BLE", "E722", "PL", "TRY"]
+ignore = [
+    "PLR0911", # decision functions return early by design (guard, error mapping)
+    "PLR0912",
+    "PLR0913",
+    "PLR2004", # thresholds are named constants; tests compare literals
+    "TRY003",
+    "TRY300",
+    "RUF001", # zh/en risk word lists contain full-width punctuation on purpose
+    "RUF012",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["ANN", "PLR", "S101"]
+"tests/**" = ["ANN", "PLR"]
+"eval/**/test_*.py" = ["ANN", "PLR"]
+# Hook scripts must run on Python 3.8 (AGENTS.md): no PEP 604/585 runtime syntax, no pathlib rewrites
+# that would hide the os.path calls the 3.8 budget relies on.
+"plugins/computer-use/hooks/bin/**" = ["UP006", "UP007", "UP035", "UP045", "PTH"]
+# Phase 0 probe plugin: stdlib-only scripts on Python 3.8 like the hooks; the payload dumper is a
+# process edge that must always fail open.
+"eval/phase0/probe-plugin/bin/**" = ["UP006", "UP007", "UP035", "UP045", "PTH", "UP031", "BLE001"]
+"tests/hooks/**" = ["ANN", "PLR", "PTH", "UP006", "UP007", "UP035", "UP045"]
+# Process edges: the only places `except Exception` is allowed, each mapped to a defined outcome.
+"plugins/computer-use/hooks/bin/hooklib/entry*.py" = ["BLE001"]
+"servers/grok-computer-mcp/src/grok_computer_mcp/hooklib/entry*.py" = ["BLE001"]
+"servers/grok-computer-mcp/src/grok_computer_mcp/server.py" = ["BLE001"]
+"servers/grok-computer-mcp/src/grok_computer_mcp/cli.py" = ["BLE001"]
+"servers/grok-computer-mcp/src/grok_computer_mcp/hooklib/**" = ["UP006", "UP007", "UP035", "UP045", "PTH"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["grok_computer_mcp", "hooklib"]
+
+[tool.pyright]
+typeCheckingMode = "strict"
+pythonVersion = "3.11"
+include = ["plugins", "servers/grok-computer-mcp/src", "servers/grok-computer-mcp/tests", "tests", "eval", "scripts", "typings"]
+exclude = ["**/.venv", "**/__pycache__", "eval/grounding/data"]
+reportMissingModuleSource = "none"
+stubPath = "typings"
+executionEnvironments = [
+    { root = "plugins/computer-use/hooks/bin", pythonVersion = "3.8" },
+    { root = "servers/grok-computer-mcp/src/grok_computer_mcp/hooklib", pythonVersion = "3.8" },
+    { root = "servers/grok-computer-mcp/src" },
+    { root = "servers/grok-computer-mcp/tests", extraPaths = ["servers/grok-computer-mcp/src"] },
+    { root = "tests/hooks", pythonVersion = "3.8", extraPaths = ["tests/hooks", "plugins/computer-use/hooks/bin"] },
+    { root = "tests", extraPaths = ["tests", "plugins/computer-use/hooks/bin", "scripts"] },
+    { root = "eval/phase0/probe-plugin", pythonVersion = "3.8" },
+    { root = "eval", extraPaths = [".", "eval/tasks/computer_use", "eval/harness", "eval/tests", "eval/grounding", "eval/phase0", "plugins/computer-use/hooks/bin", "servers/grok-computer-mcp/src"] },
+    { root = "scripts" },
+]
