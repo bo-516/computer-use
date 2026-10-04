@@ -6,12 +6,29 @@ readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.11"
 authors = [{ name = "Grok Computer contributors" }]
-keywords = ["mcp", "computer-use", "gui", "automation", "grok"]
+keywords = [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "computer-use",
+    "gui-automation",
+    "desktop-automation",
+    "accessibility",
+    "ai-agent",
+    "grok",
+    "grok-build",
+]
 classifiers = [
+    "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Testing",
 ]
 # Default dependencies must stay MIT / Apache-2.0 / BSD (AGENTS.md). mcp: MIT; pydantic: MIT;
 # pillow: MIT-CMU (MIT family); httpx2 (grounding HTTP, also mcp's client): BSD-3-Clause.
@@ -22,6 +39,11 @@ dependencies = [
     "pillow>=11.0,<13",
     "pydantic>=2.11,<3",
 ]
+
+[project.urls]
+Homepage = "https://github.com/bo-516/computer-use"
+Repository = "https://github.com/bo-516/computer-use"
+Issues = "https://github.com/bo-516/computer-use/issues"
 
 [project.scripts]
 grok-computer-mcp = "grok_computer_mcp.cli:main"

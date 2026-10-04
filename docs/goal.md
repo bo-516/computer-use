@@ -251,6 +251,7 @@ grok-computer/
 
 - manifest 放在 `plugins/computer-use/.grok-plugin/plugin.json`，而不是插件根目录：官方 marketplace 的目录工具只读取 `.grok-plugin/plugin.json` 或 `.claude-plugin/plugin.json`，根目录的 `plugin.json` 不会进入组件目录。
 - 本仓库的 `marketplace.json` 使用 `local` 源（插件与 marketplace 同仓库，随 marketplace 源的提交一起固定）。供其他目录（如 xai-org/plugin-marketplace）引用时，用 `uv run python scripts/plugin_index.py --entry <40 位 sha> --url <git 地址>` 生成固定 sha 的 `url` 源条目（含 `path: plugins/computer-use`）；用户也可以直接安装固定提交：`grok plugin install your-org/grok-computer@<sha>#plugins/computer-use --trust`。
+- marketplace 条目的 `keywords` 只放品牌/产品词（`computer-use`、`computer use`、`grok computer`、`grok-computer-mcp`），并带 `homepage`：Grok Build 用 `keywords` 和插件名按词边界匹配用户输入、主动推荐插件（CTA），`gui`、`browser`、`testing` 这类通用词会在无关请求上误触发，xai-org/plugin-marketplace 也会退回带通用词或缺 `homepage` 的提交。附录 A.1 中的 keywords 是设计阶段的旧值。
 - `.grok-plugin/plugin-index.json` 由 `scripts/plugin_index.py` 生成，格式与官方目录一致（版本 + skills/commands/agents/mcpServers/hooks 组件清单），CI 用 `--check` 保证它与插件文件一致。
 
 ### 4.3 MCP 挂载（`.mcp.json`）

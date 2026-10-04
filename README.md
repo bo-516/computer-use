@@ -2,7 +2,7 @@
 
 **English** | [简体中文](README.zh-CN.md)
 
-Let Grok Build see the screen, click and type: a Grok Build plugin (`computer-use`) plus a purpose-built MCP facade (`grok-computer-mcp`). The main use is checking UI inside the development loop (change code → launch the app → look at the UI → change again), and operating desktop and web tools that have no API.
+Computer use for Grok Build: a Grok Build plugin (`computer-use`) plus a purpose-built MCP server (the `grok-computer-mcp` facade) that let Grok Build see the screen, click and type in desktop apps and browsers on macOS, Windows and Linux. The main use is checking UI inside the development loop (change code → launch the app → look at the UI → change again), and operating desktop and web tools that have no API.
 
 Design document: [docs/goal.md](docs/goal.md). Installation and configuration: [docs/install.md](docs/install.md). The documents under `docs/` are written in Chinese.
 

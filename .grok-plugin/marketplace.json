@@ -8,7 +8,8 @@
       "description": "Let Grok see and operate desktop apps and browsers through a dedicated subagent, with a safety-checked MCP facade",
       "category": "automation",
       "version": "0.2.0",
-      "keywords": ["computer-use", "gui", "desktop", "browser", "testing"],
+      "homepage": "https://github.com/bo-516/computer-use",
+      "keywords": ["computer-use", "computer use", "grok computer", "grok-computer-mcp"],
       "source": { "type": "local", "path": "./plugins/computer-use" }
     }
   ]
