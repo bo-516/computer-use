@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "plugins": {
+    "computer-use": {
+      "version": "0.2.0",
+      "components": {
+        "agents": [
+          {
+            "name": "computer",
+            "description": "Operates desktop apps and web browsers by observing the screen (accessibility tree and screenshots) and using mouse and…"
+          }
+        ],
+        "commands": [
+          {
+            "name": "computer",
+            "description": "Delegate a GUI task to the computer subagent"
+          }
+        ],
+        "hooks": [
+          {
+            "name": "PostToolUse",
+            "description": "^(computer|browser|cua)__"
+          },
+          {
+            "name": "PostToolUseFailure",
+            "description": "^(computer|browser|cua)__"
+          },
+          {
+            "name": "PreToolUse",
+            "description": "^(computer|browser|cua)__"
+          },
+          {
+            "name": "SessionStart"
+          },
+          {
+            "name": "SubagentStop",
+            "description": "computer$"
+          }
+        ],
+        "mcpServers": [
+          {
+            "name": "browser",
+            "description": "stdio"
+          },
+          {
+            "name": "computer",
+            "description": "stdio"
+          }
+        ],
+        "skills": [
+          {
+            "name": "computer-use",
+            "description": "How to delegate GUI work to the computer subagent. Use when a task requires seeing or interacting with a real desktop a…"
+          }
+        ]
+      }
+    }
+  }
+}
