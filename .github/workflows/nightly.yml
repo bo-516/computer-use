@@ -1,0 +1,106 @@
+# Nightly task-set subset on a Linux desktop (goal.md §9.5): Xvfb + a window manager, the real
+# Cua Driver, grok headless with the plugin, GROK_COMPUTER_ASK_AS_DENY=1 so every guard ask is a
+# logged deny, and the static deny rule for the raw driver. Only the metrics summary leaves the
+# runner: traces, screenshots and per-run logs stay local (AGENTS.md), so they are not uploaded.
+#
+# Repository configuration (Settings > Secrets and variables > Actions):
+#   secrets.XAI_API_KEY          grok authentication for headless runs
+#   vars.GROK_INSTALL_COMMAND    official grok CLI install command (pinned below by version)
+#   vars.GROK_VERSION            grok version to run, e.g. 1.0.46
+#   vars.CUA_DRIVER_RS_VERSION   Cua Driver release tag to install (the installer honours it)
+name: nightly
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+    inputs:
+      subset:
+        description: "Task subset from eval/harness/subsets.json"
+        default: nightly
+
+permissions:
+  contents: read
+
+jobs:
+  tasks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    env:
+      DISPLAY: ":99"
+      # GTK and Qt apps expose accessibility trees over AT-SPI only when asked to.
+      GTK_MODULES: "gail:atk-bridge"
+      QT_LINUX_ACCESSIBILITY_ALWAYS_ON: "1"
+      GROK_COMPUTER_ASK_AS_DENY: "1"
+      GROK_COMPUTER_EVAL_BROWSER: google-chrome
+      XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.11.27"
+          python-version: "3.11"
+          enable-cache: true
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+      - name: Check configuration
+        env:
+          GROK_INSTALL_COMMAND: ${{ vars.GROK_INSTALL_COMMAND }}
+          GROK_VERSION: ${{ vars.GROK_VERSION }}
+          CUA_DRIVER_RS_VERSION: ${{ vars.CUA_DRIVER_RS_VERSION }}
+        run: |
+          missing=""
+          for name in XAI_API_KEY GROK_INSTALL_COMMAND GROK_VERSION CUA_DRIVER_RS_VERSION; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::nightly needs:$missing (see the header of this workflow)"
+            exit 1
+          fi
+      - name: Desktop (Xvfb, xfwm4, task apps)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb xfwm4 mousepad thunar galculator xterm dbus-x11 \
+            at-spi2-core
+          Xvfb :99 -screen 0 1280x800x24 >/tmp/xvfb.log 2>&1 &
+          sleep 2
+          eval "$(dbus-launch --sh-syntax)"
+          echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS" >> "$GITHUB_ENV"
+          /usr/libexec/at-spi-bus-launcher --launch-immediately >/tmp/atspi.log 2>&1 &
+          xfwm4 >/tmp/xfwm4.log 2>&1 &
+      - name: Cua Driver (pinned release)
+        env:
+          CUA_DRIVER_RS_VERSION: ${{ vars.CUA_DRIVER_RS_VERSION }}
+        run: |
+          curl -fsSL https://cua.ai/driver/install.sh | bash
+          command -v cua-driver
+      - name: grok (pinned version)
+        env:
+          GROK_INSTALL_COMMAND: ${{ vars.GROK_INSTALL_COMMAND }}
+          GROK_VERSION: ${{ vars.GROK_VERSION }}
+        run: |
+          bash -c "$GROK_INSTALL_COMMAND"
+          export PATH="$HOME/.grok/bin:$PATH"
+          grok update --version "$GROK_VERSION"
+          echo "$HOME/.grok/bin" >> "$GITHUB_PATH"
+      - name: Sync locked environment
+        run: uv sync --locked
+      - name: Facade self-check
+        run: uv run grok-computer-mcp doctor
+      - name: Run task subset
+        env:
+          SUBSET: ${{ inputs.subset || 'nightly' }}
+        run: uv run python eval/harness/run_grok.py --subset "$SUBSET" --out "$RUNNER_TEMP/grok-eval"
+      - name: Keep the metrics summary only
+        if: always()
+        run: |
+          mkdir -p metrics
+          cp "$RUNNER_TEMP/grok-eval/summary.json" metrics/ 2>/dev/null || true
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: nightly-metrics
+          path: metrics/
+          if-no-files-found: warn
+          retention-days: 30
