@@ -1,0 +1,34 @@
+[project]
+name = "grok-computer-mcp"
+version = "0.2.0"
+description = "Computer-use facade MCP server for Grok Build: one observation format, canonical screenshots, coordinate mapping, hard safety rules and traces on top of Cua Driver"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+authors = [{ name = "Grok Computer contributors" }]
+keywords = ["mcp", "computer-use", "gui", "automation", "grok"]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+# Default dependencies must stay MIT / Apache-2.0 / BSD (AGENTS.md). mcp: MIT; pydantic: MIT;
+# pillow: MIT-CMU (MIT family); httpx2 (grounding HTTP, also mcp's client): BSD-3-Clause.
+# Cua Driver is an external program (MIT), not a Python import.
+dependencies = [
+    "httpx2>=2.13,<3",
+    "mcp==2.3.0",
+    "pillow>=11.0,<13",
+    "pydantic>=2.11,<3",
+]
+
+[project.scripts]
+grok-computer-mcp = "grok_computer_mcp.cli:main"
+
+[build-system]
+requires = ["hatchling==1.29.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/grok_computer_mcp"]

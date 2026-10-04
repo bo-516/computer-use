@@ -1,0 +1,666 @@
+{
+ "displays": [
+  {
+   "id": "main",
+   "bounds": [
+    0,
+    0,
+    1512,
+    982
+   ],
+   "scale": 2.0,
+   "origin_px": [
+    0,
+    0
+   ]
+  }
+ ],
+ "apps": [
+  {
+   "name": "MyApp",
+   "pid": 4242,
+   "bundle_id": "dev.example.myapp",
+   "windows": [
+    {
+     "title": "Settings",
+     "bounds": [
+      100,
+      80,
+      1200,
+      800
+     ],
+     "focused": "name",
+     "root": {
+      "id": "win",
+      "role": "AXWindow",
+      "label": "Settings",
+      "frame": [
+       0,
+       0,
+       1200,
+       800
+      ],
+      "children": [
+       {
+        "id": "back",
+        "role": "AXButton",
+        "label": "Back",
+        "frame": [
+         12,
+         40,
+         60,
+         24
+        ],
+        "on_click": [
+         "set_title:Home"
+        ]
+       },
+       {
+        "id": "profile",
+        "role": "AXGroup",
+        "label": "Profile",
+        "frame": [
+         20,
+         160,
+         560,
+         300
+        ],
+        "children": [
+         {
+          "id": "login",
+          "role": "AXCheckBox",
+          "label": "Launch at login",
+          "value": "0",
+          "frame": [
+           40,
+           180,
+           220,
+           22
+          ],
+          "on_click": [
+           "toggle"
+          ]
+         },
+         {
+          "id": "dark",
+          "role": "AXCheckBox",
+          "subrole": "AXSwitch",
+          "label": "Dark mode",
+          "value": "0",
+          "frame": [
+           40,
+           214,
+           220,
+           22
+          ],
+          "on_click": [
+           "toggle"
+          ]
+         },
+         {
+          "id": "name",
+          "role": "AXTextField",
+          "label": "Display name",
+          "value": "Ana",
+          "frame": [
+           40,
+           260,
+           320,
+           26
+          ],
+          "on_enter": [
+           "copy_value:name:status"
+          ]
+         },
+         {
+          "id": "token",
+          "role": "AXTextField",
+          "subrole": "AXSecureTextField",
+          "label": "API token",
+          "frame": [
+           40,
+           300,
+           320,
+           26
+          ]
+         },
+         {
+          "id": "card",
+          "role": "AXTextField",
+          "label": "Card number",
+          "frame": [
+           40,
+           340,
+           320,
+           26
+          ]
+         },
+         {
+          "id": "disabled",
+          "role": "AXButton",
+          "label": "Sync now",
+          "enabled": false,
+          "frame": [
+           40,
+           380,
+           120,
+           26
+          ]
+         }
+        ]
+       },
+       {
+        "id": "files",
+        "role": "AXList",
+        "label": "Files",
+        "frame": [
+         600,
+         160,
+         560,
+         300
+        ],
+        "children": [
+         {
+          "id": "row1",
+          "role": "AXRow",
+          "label": "file-01.txt",
+          "frame": [
+           610,
+           194,
+           540,
+           22
+          ],
+          "on_click": [
+           "set_value:status:Selected file-01.txt"
+          ]
+         },
+         {
+          "id": "row2",
+          "role": "AXRow",
+          "label": "file-02.txt",
+          "frame": [
+           610,
+           218,
+           540,
+           22
+          ],
+          "on_click": [
+           "set_value:status:Selected file-02.txt"
+          ]
+         },
+         {
+          "id": "row3",
+          "role": "AXRow",
+          "label": "file-03.txt",
+          "frame": [
+           610,
+           242,
+           540,
+           22
+          ],
+          "on_click": [
+           "set_value:status:Selected file-03.txt"
+          ]
+         },
+         {
+          "id": "row4",
+          "role": "AXRow",
+          "label": "file-04.txt",
+          "frame": [
+           610,
+           266,
+           540,
+           22
+          ],
+          "on_click": [
+           "set_value:status:Selected file-04.txt"
+          ]
+         },
+         {
+          "id": "row5",
+          "role": "AXRow",
+          "label": "file-05.txt",
+          "frame": [
+           610,
+           290,
+           540,
+           22
+          ],
+          "on_click": [
+           "set_value:status:Selected file-05.txt"
+          ]
+         },
+         {
+          "id": "row6",
+          "role": "AXRow",
+          "label": "file-06.txt",
+          "frame": [
+           610,
+           314,
+           540,
+           22
+          ],
+          "on_click": [
+           "set_value:status:Selected file-06.txt"
+          ]
+         },
+         {
+          "id": "row7",
+          "role": "AXRow",
+          "label": "file-07.txt",
+          "frame": [
+           610,
+           338,
+           540,
+           22
+          ],
+          "on_click": [
+           "set_value:status:Selected file-07.txt"
+          ]
+         },
+         {
+          "id": "row8",
+          "role": "AXRow",
+          "label": "file-08.txt",
+          "frame": [
+           610,
+           362,
+           540,
+           22
+          ],
+          "on_click": [
+           "set_value:status:Selected file-08.txt"
+          ]
+         },
+         {
+          "id": "row9",
+          "role": "AXRow",
+          "label": "file-09.txt",
+          "frame": [
+           610,
+           386,
+           540,
+           22
+          ],
+          "on_click": [
+           "set_value:status:Selected file-09.txt"
+          ]
+         },
+         {
+          "id": "row10",
+          "role": "AXRow",
+          "label": "file-10.txt",
+          "frame": [
+           610,
+           410,
+           540,
+           22
+          ],
+          "on_click": [
+           "set_value:status:Selected file-10.txt"
+          ]
+         },
+         {
+          "id": "row11",
+          "role": "AXRow",
+          "label": "file-11.txt",
+          "frame": [
+           610,
+           434,
+           540,
+           22
+          ],
+          "on_click": [
+           "set_value:status:Selected file-11.txt"
+          ]
+         },
+         {
+          "id": "row12",
+          "role": "AXRow",
+          "label": "file-12.txt",
+          "frame": [
+           610,
+           458,
+           540,
+           22
+          ],
+          "on_click": [
+           "set_value:status:Selected file-12.txt"
+          ]
+         }
+        ]
+       },
+       {
+        "id": "status",
+        "role": "AXStaticText",
+        "label": "Status",
+        "value": "",
+        "frame": [
+         40,
+         700,
+         400,
+         20
+        ]
+       },
+       {
+        "id": "save",
+        "role": "AXButton",
+        "label": "Save",
+        "frame": [
+         1100,
+         740,
+         80,
+         28
+        ],
+        "on_click": [
+         "set_value:status:Saved",
+         "set_unsaved:false"
+        ]
+       },
+       {
+        "id": "delete",
+        "role": "AXButton",
+        "label": "Delete account",
+        "frame": [
+         900,
+         740,
+         160,
+         28
+        ],
+        "on_click": [
+         "show:confirm"
+        ]
+       },
+       {
+        "id": "confirm",
+        "role": "AXSheet",
+        "label": "Confirm",
+        "visible": false,
+        "frame": [
+         400,
+         300,
+         400,
+         160
+        ],
+        "children": [
+         {
+          "id": "confirm_text",
+          "role": "AXStaticText",
+          "label": "Delete your account?",
+          "frame": [
+           420,
+           320,
+           360,
+           20
+          ]
+         },
+         {
+          "id": "cancel",
+          "role": "AXButton",
+          "label": "Cancel",
+          "frame": [
+           560,
+           410,
+           100,
+           28
+          ],
+          "on_click": [
+           "hide:confirm"
+          ]
+         },
+         {
+          "id": "really",
+          "role": "AXButton",
+          "label": "Delete",
+          "frame": [
+           680,
+           410,
+           100,
+           28
+          ],
+          "on_click": [
+           "hide:confirm",
+           "set_value:status:Deleted"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "Notes",
+   "pid": 5150,
+   "bundle_id": "com.example.notes",
+   "windows": [
+    {
+     "title": "Untitled",
+     "bounds": [
+      300,
+      200,
+      800,
+      600
+     ],
+     "focused": "body",
+     "root": {
+      "id": "win",
+      "role": "AXWindow",
+      "label": "Untitled",
+      "frame": [
+       0,
+       0,
+       800,
+       600
+      ],
+      "children": [
+       {
+        "id": "body",
+        "role": "AXTextArea",
+        "label": "Note body",
+        "value": "",
+        "frame": [
+         20,
+         60,
+         760,
+         500
+        ]
+       },
+       {
+        "id": "close",
+        "role": "AXButton",
+        "subrole": "AXCloseButton",
+        "label": "Close",
+        "frame": [
+         10,
+         10,
+         16,
+         16
+        ],
+        "on_click": [
+         "close_window"
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "1Password",
+   "pid": 6000,
+   "bundle_id": "com.1password.1password",
+   "windows": [
+    {
+     "title": "1Password",
+     "bounds": [
+      1000,
+      100,
+      400,
+      500
+     ],
+     "root": {
+      "id": "win",
+      "role": "AXWindow",
+      "label": "1Password",
+      "frame": [
+       0,
+       0,
+       400,
+       500
+      ],
+      "children": [
+       {
+        "id": "search",
+        "role": "AXTextField",
+        "label": "Search vault",
+        "frame": [
+         20,
+         40,
+         360,
+         26
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "Paint",
+   "pid": 8100,
+   "bundle_id": "com.example.paint",
+   "windows": [
+    {
+     "title": "Canvas",
+     "bounds": [
+      60,
+      60,
+      900,
+      700
+     ],
+     "root": {
+      "id": "win",
+      "role": "AXWindow",
+      "label": "Canvas",
+      "frame": [
+       0,
+       0,
+       900,
+       700
+      ],
+      "children": [
+       {
+        "id": "canvas",
+        "role": "AXGroup",
+        "label": "Canvas",
+        "frame": [
+         0,
+         40,
+         900,
+         660
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "Calculator",
+   "pid": 7000,
+   "bundle_id": "com.apple.calculator",
+   "template": "calculator"
+  }
+ ],
+ "templates": {
+  "calculator": {
+   "title": "Calculator",
+   "bounds": [
+    700,
+    300,
+    240,
+    320
+   ],
+   "root": {
+    "id": "win",
+    "role": "AXWindow",
+    "label": "Calculator",
+    "frame": [
+     0,
+     0,
+     240,
+     320
+    ],
+    "children": [
+     {
+      "id": "display",
+      "role": "AXStaticText",
+      "label": "Result",
+      "value": "0",
+      "frame": [
+       10,
+       30,
+       220,
+       40
+      ]
+     },
+     {
+      "id": "one",
+      "role": "AXButton",
+      "label": "1",
+      "frame": [
+       10,
+       90,
+       50,
+       50
+      ],
+      "on_click": [
+       "set_value:display:1"
+      ]
+     },
+     {
+      "id": "two",
+      "role": "AXButton",
+      "label": "2",
+      "frame": [
+       70,
+       90,
+       50,
+       50
+      ],
+      "on_click": [
+       "set_value:display:2"
+      ]
+     },
+     {
+      "id": "plus",
+      "role": "AXButton",
+      "label": "Add",
+      "frame": [
+       130,
+       90,
+       50,
+       50
+      ]
+     },
+     {
+      "id": "equals",
+      "role": "AXButton",
+      "label": "Equals",
+      "frame": [
+       190,
+       90,
+       40,
+       50
+      ],
+      "on_click": [
+       "set_value:display:3"
+      ]
+     }
+    ]
+   }
+  }
+ }
+}
