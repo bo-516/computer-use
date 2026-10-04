@@ -1,9 +1,10 @@
 # grok-computer-mcp
 
-The desktop facade of the Grok Build `computer-use` plugin: an MCP server (stdio) that gives the
-plugin's `computer` subagent nine small GUI tools on top of [Cua Driver](https://github.com/trycua/cua),
-with one coordinate space, canonical screenshots, compact accessibility observations and
-fail-closed safety rules.
+The desktop facade of the Grok Build
+[`computer-use` plugin](https://github.com/bo-516/computer-use): an MCP server (stdio) that gives
+the plugin's `computer` subagent nine small GUI tools on top of
+[Cua Driver](https://github.com/trycua/cua), with one coordinate space, canonical screenshots,
+compact accessibility observations and fail-closed safety rules.
 
 | Tool | Purpose |
 |---|---|
@@ -35,6 +36,7 @@ uvx grok-computer-mcp@0.2.0 trace purge --all
 machines without a system `python3`.
 
 Configuration is through `GROK_COMPUTER_*` environment variables (backend, host or sandbox mode,
-Cua Driver transport, grounding provider and tier); see `docs/install.md` in the repository.
+Cua Driver transport, grounding provider and tier); see
+[`docs/install.md`](https://github.com/bo-516/computer-use/blob/main/docs/install.md) in the repository.
 
 License: Apache-2.0.

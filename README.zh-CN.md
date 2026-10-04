@@ -2,7 +2,7 @@
 
 [English](README.md) | **简体中文**
 
-让 Grok Build 能看屏幕、点鼠标、敲键盘：一个 Grok Build 插件（`computer-use`）加一个自研的门面 MCP 服务（`grok-computer-mcp`）。主要用途是开发闭环里的界面验证（改代码 → 启动应用 → 看界面 → 再改），以及操作没有 API 的桌面和网页工具。
+为 Grok Build 提供 computer use（电脑操控）能力：一个 Grok Build 插件（`computer-use`）加一个自研的门面 MCP 服务（`grok-computer-mcp`），让 Grok Build 能在 macOS、Windows、Linux 的桌面应用和浏览器里看屏幕、点鼠标、敲键盘。主要用途是开发闭环里的界面验证（改代码 → 启动应用 → 看界面 → 再改），以及操作没有 API 的桌面和网页工具。
 
 设计文档：[docs/goal.md](docs/goal.md)。安装与配置：[docs/install.md](docs/install.md)。
 
