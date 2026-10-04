@@ -1,0 +1,10 @@
+{
+  "name": "computer-use",
+  "version": "0.2.0",
+  "description": "Desktop and browser GUI control for Grok Build via a dedicated computer subagent, the grok-computer-mcp facade and safety hooks",
+  "author": { "name": "Grok Computer contributors" },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/bo-516/computer-use",
+  "repository": "https://github.com/bo-516/computer-use",
+  "keywords": ["computer-use", "gui", "desktop", "browser", "automation", "testing"]
+}

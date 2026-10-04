@@ -1,0 +1,43 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python3 \"${GROK_PLUGIN_ROOT}/hooks/bin/selfcheck.py\"", "timeout": 5 }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "^(computer|browser|cua)__",
+        "hooks": [
+          { "type": "command", "command": "python3 \"${GROK_PLUGIN_ROOT}/hooks/bin/guard.py\"", "timeout": 5 }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^(computer|browser|cua)__",
+        "hooks": [
+          { "type": "command", "command": "python3 \"${GROK_PLUGIN_ROOT}/hooks/bin/audit.py\"", "timeout": 5 }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "^(computer|browser|cua)__",
+        "hooks": [
+          { "type": "command", "command": "python3 \"${GROK_PLUGIN_ROOT}/hooks/bin/audit.py\"", "timeout": 5 }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "computer$",
+        "hooks": [
+          { "type": "command", "command": "python3 \"${GROK_PLUGIN_ROOT}/hooks/bin/verify_gate.py\"", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}

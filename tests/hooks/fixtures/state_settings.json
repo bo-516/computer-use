@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "updated_at": 0,
+  "observation_id": "obs_7f3a",
+  "app": "MyApp",
+  "pid": 4242,
+  "window_id": 4521,
+  "window_title": "Settings",
+  "window_unsaved": false,
+  "scope": "window",
+  "image": [1280, 800],
+  "elements": {
+    "e1": { "role": "button", "label": "Back", "app": "MyApp", "bbox": [12, 40, 60, 24] },
+    "e5": { "role": "checkbox", "label": "Launch at login", "app": "MyApp", "bbox": [40, 180, 220, 22] },
+    "e7": { "role": "switch", "label": "Dark mode", "app": "MyApp", "bbox": [40, 214, 220, 22] },
+    "e9": { "role": "textfield", "label": "Display name", "app": "MyApp", "bbox": [40, 260, 320, 26], "in_form": true },
+    "e10": { "role": "textfield", "label": "Card number", "app": "MyApp", "bbox": [40, 300, 320, 26], "in_form": true },
+    "e12": { "role": "securefield", "label": "API token", "app": "MyApp", "bbox": [40, 340, 320, 26], "secure": true, "in_form": true },
+    "e14": { "role": "button", "label": "Delete account", "app": "MyApp", "bbox": [900, 740, 160, 28] },
+    "e15": { "role": "button", "label": "Save", "app": "MyApp", "bbox": [1100, 740, 80, 28] }
+  },
+  "marks": {
+    "1": { "ref": "e1", "role": "button", "label": "Back", "app": "MyApp", "bbox": [12, 40, 60, 24] },
+    "12": { "ref": "e15", "role": "button", "label": "Save", "app": "MyApp", "bbox": [1100, 740, 80, 28] },
+    "13": { "ref": "e14", "role": "button", "label": "Delete account", "app": "MyApp", "bbox": [900, 740, 160, 28] }
+  },
+  "focused": { "ref": "e9", "role": "textfield", "label": "Display name", "app": "MyApp", "in_form": true },
+  "last_hit": null,
+  "last_action_at": 0,
+  "last_observe_at": 0,
+  "last_screenshot_path": null,
+  "last_screenshot_at": null
+}

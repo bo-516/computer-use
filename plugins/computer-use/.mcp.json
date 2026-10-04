@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "computer": {
+      "command": "uvx",
+      "args": ["grok-computer-mcp@0.2.0"],
+      "env": {
+        "GROK_COMPUTER_BACKEND": "cua-driver",
+        "GROK_COMPUTER_MODE": "host",
+        "GROK_COMPUTER_SCREENSHOT_LONG_EDGE": "1280",
+        "GROK_PLUGIN_DATA": "${GROK_PLUGIN_DATA}"
+      }
+    },
+    "browser": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@0.0.83", "--isolated"]
+    }
+  }
+}
