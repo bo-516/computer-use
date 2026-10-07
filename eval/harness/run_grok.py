@@ -96,7 +96,8 @@ async def run_one(variant: taskkit.Variant, args: argparse.Namespace,
     error = None if result.exit_code == 0 else f"grok exit {result.exit_code}: {result.stderr_tail}"
     return metrics.RunRecord(variant.id, variant.category, variant.red_team, reward,
                              list(variant.tags), tokens, turns, cost, calls, asks, denies,
-                             result.duration_s, error)
+                             result.duration_s, error,
+                             images=metrics.count_images(host.audit_records()))
 
 
 async def main_async(args: argparse.Namespace) -> int:

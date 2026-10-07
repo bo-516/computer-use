@@ -19,6 +19,7 @@ from ..observe import capture as capture_mod
 from ..observe.elements import ObservedElement
 from ..observe.fingerprint import dhash, tree_fingerprint
 from ..observe.som import Mark, Region, draw_marks, marks_for
+from ..observe.textsel import mark_credential_text
 from ..observe.tree import build_elements
 from ..safety.policy import SafetyRules
 from ..session import Mode, Observation, now
@@ -90,7 +91,9 @@ async def build(ctx: FacadeContext, rules: SafetyRules, snapshot: WindowSnapshot
     frame, space = frame_of(ctx, snapshot, key_sizes.get(window.window_id))
     if snapshot.capture is not None:
         key_sizes[window.window_id] = (snapshot.capture.width, snapshot.capture.height)
-    elements = build_elements(snapshot.elements, frame, space, rules, ctx.store.allocator(window))
+    elements = mark_credential_text(
+        build_elements(snapshot.elements, frame, space, rules, ctx.store.allocator(window)),
+        rules)
     obs = Observation(
         id=ctx.store.new_id(), created_at=now(), scope="window", app=window.app, pid=window.pid,
         window=window, frame=frame, frame_space=space, elements=elements, marks={},

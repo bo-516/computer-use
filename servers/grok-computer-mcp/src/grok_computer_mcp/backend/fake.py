@@ -141,9 +141,11 @@ class FakeBackend(FakeActions):
                 handle=f"t{self.generation}:{node.id}", subrole=node.subrole,
                 enabled=node.enabled, focused=w.focused == node.id,
                 parent=index_of.get(parent) if parent else None, depth=depth,
-                actions=("press",) if node.on_click else ()))
+                actions=("press",) if node.on_click else (),
+                expanded=node.expanded, min_value=node.min_value, max_value=node.max_value,
+                placeholder=node.placeholder))
         return WindowSnapshot(self._info(w), display, tuple(elements), self.frame_space, capture,
-                              truncated=len(w.walk()) > max_elements)
+                              degraded=w.degraded, truncated=len(w.walk()) > max_elements)
 
     async def read_screen(self, *, screenshot: bool) -> ScreenSnapshot:
         """Primary display with its on-screen windows."""

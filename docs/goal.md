@@ -102,6 +102,7 @@ P0 场景决定了设计取舍：任务短（通常 < 30 步）、目标应用�
 | bytedance/UI-TARS（模型）/ UI-TARS-desktop | GUI grounding 视觉模型 / 完整桌面 agent | 以模型卡/仓库为准 | **grounding 兜底模型**；desktop 应用只做架构参考 |
 | simular-ai/Agent-S | 规划模型与 grounding 模型分离的框架，自报 OSWorld 72.6% | Apache-2.0 | 借鉴"规划/定位分离"与反思机制 |
 | OthersideAI/self-operating-computer | 极简截图 + 键鼠 agent，含 OCR、Set-of-Mark 模式 | MIT | 参考 SoM 实现 |
+| CursorTouch/Windows-MCP | Windows 桌面 MCP。默认只回文本 UI 树（命名容器、滚动位置、模态聚焦、工具内 WaitFor）；动作按 label 下标取中心坐标再点鼠标 | MIT | **仅作参考，不采用其动作模型**。观测文本（少截图）见 `docs/26-10-07-fewer-screenshots-refactor.md`。不引入 label 下标点击、shell、文件系统、注册表或遥测 |
 | bytebot-ai/bytebot | 容器化桌面 agent | Apache-2.0 | 原仓库已于 2026-03 归档，**不依赖** |
 
 ### 2.3 选型结论
@@ -335,15 +336,16 @@ grok_computer_mcp/
 │   ├── base.py / records.py           # Backend 协议与数据类型（门面只经此调用驱动）
 │   ├── cua.py / cua_core.py           # Cua Driver 实现
 │   ├── cua_transport.py / cua_cli.py  # MCP（默认）与 CLI 两种传输
-│   ├── cua_parse.py                   # 驱动回复解析与拒绝码分类（V16）
+│   ├── cua_parse.py / cua_elements.py # 驱动回复解析（V16）与元素字段（V17）
 │   └── fake*.py, fake_scenarios/      # 假后端：场景 JSON 渲染出树与截图
 ├── observe/
 │   ├── roles.py / elements.py / refs.py / tree.py   # 角色归一、交互过滤、稳定 ref、裁剪
-│   ├── fingerprint.py / diff.py       # 布局指纹、dHash；动作前后变化摘要
-│   ├── render.py                      # 紧凑文本
+│   ├── lines.py / textsel.py / sections.py  # 行格式、文本选取与凭据遮罩、分组/模态/滚动
+│   ├── fingerprint.py / diff.py       # 布局指纹、dHash；元素、文本与对话框变化摘要
+│   ├── render.py                      # 紧凑文本（交互元素先占预算，文本段次之）
 │   └── imaging.py / capture.py / som.py   # Pillow 适配、规范截图与遮罩、Set-of-Mark
-├── handlers/                          # 每个工具的编排：observe、actions、actions_pointer、apps、
-│                                      # locate、action_prep（过期判定）、targeting、delivery 等
+├── handlers/                          # 每个工具的编排：observe、wait、actions、actions_pointer、
+│                                      # apps、locate、action_prep、targeting、delivery 等
 ├── grounding/{base,http,uitars,xai}.py
 ├── safety/{policy,state_file}.py      # 硬规则（fail-closed）、给 hooks 的状态文件
 ├── trace/recorder.py                  # 轨迹 JSONL + 截图
@@ -363,7 +365,7 @@ grok_computer_mcp/
 | `scroll` | 滚动 | `ref?` 或 `point?`、`direction`、`amount` | 否 | 否 |
 | `drag` | 拖拽 | `from`、`to`（ref 或 point） | 否 | 视目标 |
 | `apps` | 应用与窗口管理 | `action`（`list`/`launch`/`focus`/`windows`）、`name?` | `list`/`windows` 是 | 否 |
-| `wait_for` | 等待界面条件 | `text?`、`ref_role?`、`timeout_ms` | 是 | 否 |
+| `wait_for` | 等待界面条件 | `text?`、`ref_role?`、`gone?`、`enabled?`、`title?`、`timeout_ms` | 是 | 否 |
 | `locate` | grounding 兜底：用自然语言找目标坐标 | `description`、`observation_id` | 是 | 否 |
 
 另有一个不暴露给模型的管理入口 `status`（权限、后端版本、运行模式），供 `grok-computer-mcp doctor` 命令和 SessionStart 自检使用。实现为 CLI 子命令 `grok-computer-mcp status` / `doctor`，不是 MCP 工具。
@@ -397,40 +399,60 @@ grok_computer_mcp/
 }
 ```
 
-动作结果默认只返回变化摘要，不附截图；需要视觉确认时由子 agent 显式调用 `observe(mode="screenshot")`。
+动作结果默认只返回变化摘要，不附截图；需要视觉确认时由子 agent 显式调用 `observe(mode="screenshot")`。`changes` 在已有的元素字段与窗口变化之后，还可以包含 `text_appeared` / `text_gone`（按文本内容匹配，不按 ref；每类最多 5 条，截到 80 字符）和 `dialog_opened` / `dialog_closed`（带 `ref` 与 `label`）。序列化后的 `changes` 仍 ≤ 2 KB。保存后出现 "Changes saved" 并打开 sheet 时，同一次结果里会有 `text_appeared` 与 `dialog_opened`；关闭该 sheet 则有 `dialog_closed`。
 
 **实现说明**（参数在上表基础上的增补）：
 
 - `observe` 增加 `scope`（`window` 默认 / `screen`：跨应用任务用整屏，黑名单窗口打码）与 `page`（SoM 每页 80 个编号，超出时分页）。
 - `type_text`、`press_keys` 同样必须带 `observation_id`；`press_keys.keys` 可以是一个组合键字符串或列表（每次最多 10 个）。
 - `scroll` 也接受 `mark`；`drag` 的 `from`/`to` 各自可以是 `ref`、`mark` 或 `point`。
-- `wait_for` 增加 `gone`（等待元素消失）、`app`、`window_id`；`apps` 可带可选的 `observation_id`。
+- `wait_for` 增加 `gone`（等待元素消失）、`enabled`、`title`、`app`、`window_id`。`enabled=true` 表示等到任一匹配元素可用；`enabled=false` 表示不过滤，不是等到禁用。`enabled` 与 `gone` 同时给出返回 `INVALID_ARGUMENT`。`text`、`ref_role`、`title` 至少给一个，否则 `INVALID_ARGUMENT`。`title` 是窗口标题的子串，比较时忽略大小写。窗口已关闭时与现有 `wait_for` 一样，经 `read()` 的错误映射得到 `STALE_OBSERVATION`。`apps` 可带可选的 `observation_id`。
 - `delivery` 取值 `background` / `foreground` / `foreground_retry`（后台投递被拒时自动前台重试一次）；`effect` 取值 `confirmed` / `unverifiable` / `suspected_noop` / `unknown`，说明是否观察到动作生效，`suspected_noop` 时结果附带下一步提示。
 
 ### 5.5 观测格式
 
 观测同时返回 `structuredContent`（JSON，供程序和 hook 使用）和紧凑文本（供模型阅读）。
 
-**紧凑文本**（每个交互元素一行，节省 token）：
+**紧凑文本**（交互元素按命名容器分组，静态文本不带 ref）：
 
 ```
-obs_7f3a  app=MyApp  window=4521 "Settings"  image=1280x800 (attached)
-e1  button      "Back"                     [12,40,60,24]
-e5  checkbox    "Launch at login"   off    [40,180,220,22]
-e7  switch      "Dark mode"         off    [40,214,220,22]
-e9  textfield   "Display name"      "Ana"  [40,260,320,26]
-e12 securefield "API token"         (secure, not typable)
-e15 button      "Save"                     [1100,740,80,28]
--- 23 more non-interactive elements omitted; use root_ref to expand --
+obs_7f3b  app=MyApp  window=4521 "Settings"  image=1280x853 (not attached)  mode=tree
+e2  button      "Back"                         [12,40,60,24]
+e3  group "Profile"
+  e4  checkbox    "Launch at login"            off    [40,180,220,22]
+  e5  switch      "Dark mode"                  off    [40,214,220,22]
+  e6  textfield   "Display name"               "Ana"  [40,260,320,26]
+  text "Shown to other members"
+e7  list "Recent files"  scroll ↑0 ↓24
+  e8  row         "report.md"                  [40,520,560,24]
+e9  button      "Save"                         [1100,740,80,28]
+text "Changes saved"
+-- 4 more elements not listed; use observe(root_ref=...) to expand --
+```
+
+模态对话框打开时，默认列表只含该子树：
+
+```
+obs_7f3c  app=MyApp  window=4521 "Settings"  image=1280x853 (not attached)  mode=tree  modal=e40
+e40 dialog "Delete file?"
+  text "report.md will be moved to the Trash."
+  e41 button      "Cancel"                     [700,420,80,28]
+  e42 button      "Delete"                     [800,420,80,28]
+-- modal dialog e40 open: 31 background elements hidden; observe(root_ref=e1) lists the whole window --
 ```
 
 规则：
 
-- **只列交互元素**（按钮、输入框、开关、链接、菜单项、单元格等），容器和静态文本折叠成计数；需要时用 `root_ref` 展开某个子树。
+- **交互元素优先**（按钮、输入框、开关、链接、菜单项、单元格等先占预算），文本段不改变已列出的交互元素数量。命名容器（`group`、`toolbar`、`tablist`、`list`、`table`、`dialog`、`menu`、`scrollarea`、`webarea`，且标签非空）在第一个被列出的后代出现时写成 `eN role "label"`，子项缩进 2 格，深度最多 8 层；没有任何列出子项的容器不输出。`root_ref` 展开保持按深度缩进，不分组、不加文本段。
+- **静态文本**默认列为 `text "…"`，不带 ref。与父标签、同级交互元素标签或上一行相同的跳过。选取优先级：模态内 > heading > 焦点所在容器 > 文档顺序。屏幕外的文本只在 `root_ref` 展开时出现。文本段最多 40 行、3 KB，每行最多 120 字符。
+- **滚动容器**（`scrollarea`、`list`、`table`、`webarea`）仅当上方或下方还有被裁掉的可列后代时，在标题行附加 `scroll ↑N ↓M`。计数相对最近的 `scrollarea` 祖先（没有则用图像矩形）；高度或宽度不足 2 px 的虚拟行按中点相对视口中心归入一侧。N 与 M 都为 0 时不输出该标记。
+- **可选状态**（V17，后端给出才渲染）：滑块为 `50 (0–100)`（en dash U+2013），disclosure 为 `expanded` / `collapsed`，空输入框为 `placeholder:"…"`。字段缺失时该行与原来一致。
+- **标签清洗**：去掉 Unicode 私用区（U+E000–U+F8FF、U+F0000–U+FFFFD、U+100000–U+10FFFD）和孤立代理项；删完为空则视为无标签。凭据词标签，或紧跟这类标签且整段是 ≥ 16 个非空白字符的文本，渲染为 `text (hidden: credential)`。普通的 `Token count: 3` 仍按原文列出。
+- **模态**：存在可见 `dialog`（`AXSheet` 也归一成 `dialog`）时，默认列表与 auto 计数都只含该子树；多个对话框取文档顺序中的最后一个。header 加 `modal=<ref>`，脚注给出被隐藏的背景元素数和窗口 `root_ref`。`observe(root_ref=<窗口 ref>)` 列出背景。对背景 ref 的动作不会因为对话框开着而被拒绝。
 - **ref 只在本次观测内有效**。新的观测会重新分配 ref；动作时带的 `observation_id` 与服务端当前观测不一致且界面已变化时，返回 `STALE_OBSERVATION`。实现的判定：(a) 窗口尺寸变化；(b) 布局指纹变化——指纹只含 ref、角色、可用状态与网格化 bbox，**不含**标签和值，文本刷新、计数变化不会让整个观测过期；(c) 动作目标自身的 ref、角色、标签、值或可用状态变了（开关已被切换、按钮文字变成 Delete），只拒绝该目标；(d) 坐标与 mark 动作另比较截图 dHash，汉明距离超过 16 bit 视为过期。ref 属于另一个观测时返回 `STALE_REF`。同一元素在相邻观测之间尽量保持同一个 ref（按身份与"原位改名"匹配），减少模型重新找元素的成本。
 - **bbox 一律用图像坐标**（见 5.6），即使本次没附截图，也保证与下一张截图同一坐标系。
 - **安全输入框**标记为 `secure`，`type_text` 对其硬拒绝。
-- 文本部分控制在 **16 KB 以内**（低于宿主 20 KB 截断线）；超出时按可见区域优先截断并提示 `root_ref` 分页。实现：尚不确定宿主是否也把 `structuredContent` 交给模型（V15），所以文本与 structuredContent 合计控制在 16 KB 内，超出时先缩减元素列表。
+- 文本部分控制在 **16 KB 以内**（低于宿主 20 KB 截断线）；超出时按可见区域优先截断并提示 `root_ref` 分页。实现：尚不确定宿主是否也把 `structuredContent` 交给模型（V15），所以文本与 structuredContent 合计控制在 16 KB 内。交互元素先占预算；只有加上文本段后仍不超过 16 KB 时才附上文本，否则保留不含文本段的渲染。交互列表本身超限时才按可见区域缩减元素。
 
 ### 5.6 坐标系与截图规范
 
@@ -449,17 +471,18 @@ e15 button      "Save"                     [1100,740,80,28]
 `observe(mode="auto")` 的决策：
 
 ```
-1. 读无障碍树
-2. 如果 交互元素数 ≥ 3 且 目标应用不在"无障碍差"名单中：
-       返回 tree（不附截图）
-3. 否则：
+1. 读无障碍树。若存在可见 dialog 子树，交互元素数与默认列表都只计该子树。
+2. 若应用在"无障碍差"名单中，或树不完整，或可见交互元素数为 0，
+   或可见交互元素数 < 3 且没有任何文本行：
        截图 + 用树中已有的 bbox 和轻量检测结果画 Set-of-Mark 编号
        返回 som（附带编号截图）
+3. 否则返回 tree（不附截图）。可见交互元素为 1 或 2，且至少有一行文本
+   （例如只有一个按钮和正文的对话框）时留在树模式。
 4. 子 agent 在 som 中仍找不到目标时，调用 locate(description) 走外部 grounding
 5. 最后手段：子 agent 根据截图直接给出 point 坐标
 ```
 
-"无障碍差"名单初始包含：游戏引擎窗口、远程桌面/VNC 客户端、Canvas 绘图类应用、部分 Java/Qt 应用，随评测结果维护。实现：阈值为 `limits.AUTO_MODE_MIN_INTERACTIVE = 3`，名单为策略中的 `poor_ax_apps`；som 截图里没有任何可编号元素时结果标为 `screenshot`，而不是空的 som。
+"无障碍差"名单初始包含：游戏引擎窗口、远程桌面/VNC 客户端、Canvas 绘图类应用、部分 Java/Qt 应用，随评测结果维护。实现：`limits.AUTO_MODE_MIN_INTERACTIVE = 3` 只在没有文本行时才把 1–2 个交互元素判为过薄；名单为策略中的 `poor_ax_apps`；树不完整（`degraded`）同样走 som。som 截图里没有任何可编号元素时结果标为 `screenshot`，而不是空的 som。
 
 ### 5.8 错误码
 
@@ -645,7 +668,7 @@ e15 button      "Save"                     [1100,740,80,28]
 | 手段 | 说明 |
 |---|---|
 | 子 agent 隔离 | 截图和无障碍树只进入子 agent 上下文；主 agent 只收报告 |
-| 树优先 | `auto` 模式下大多数步骤不发截图 |
+| 树优先 | `auto` 在树可用时不发截图。截图只在成功条件是视觉的（颜色、图像、布局、渲染）或任务要求时才取。评测把 `mode` 为 `screenshot` 或 `som` 的 `observe` / `wait_for`，加上 `browser__browser_take_screenshot`，记入 `avg_images`；有基线时另报 `images_delta` |
 | 动作结果不附图 | 只返回变化摘要 |
 | 规范尺寸截图 | 长边 1280 px，避免宿主二次编码，也控制视觉 token |
 | 交互元素过滤 + 子树展开 | 观测文本 ≤ 16 KB |
@@ -706,6 +729,7 @@ e15 button      "Save"                     [1100,740,80,28]
 | 未确认的高风险动作 | 红队集中 R2/R3 动作未经确认执行的次数 | 0 | 0 |
 | 注入成功率 | 红队注入任务中 agent 执行了注入指令的比例 | 记录 | 0 |
 | 误报确认率 | 正常任务中弹出 `ask` 的次数 / 任务 | 记录 | ≤ 1 |
+| 平均带图观测 `avg_images` | 非红队任务上，`computer__observe` 与 `computer__wait_for` 中 `mode` 为 `screenshot` 或 `som` 的次数，加上 `browser__browser_take_screenshot`。树模式不计入。有非零数值基线时报告 `images_delta`，算法与 `steps_delta` 相同 | 记录基线 | 少截图实机验收要求 ≤ 基线的 50%。harness 报告该差值。`phase2_met` 的目标集不含 `images_delta` |
 
 ### 9.5 CI
 
@@ -740,7 +764,7 @@ e15 button      "Save"                     [1100,740,80,28]
 | Phase 3 | SoM（分页、编号截图）、`locate`（UI-TARS 与 xAI 两种客户端、采样聚类）、strict 档位、60 个任务变体、夜间 CI | 对比"无障碍差"类任务的提升幅度 |
 | Phase 4 | `sandbox` 模式（门面连接 VM/容器内驱动、按目标加锁）、plugin-index 与固定 sha 条目、`doctor`/`status`/`stop`/`resume`/`trace purge`、用户文档（`README.md`、`docs/install.md`） | 新用户 10 分钟安装验收；沙箱模式通过任务集 |
 
-**与原计划的差异**：Phase 1 的"子 agent 直连 `cua`"形态没有单独交付。guard 无法从 Cua 原生工具的参数（pid、window_id、坐标）判断目标，按"无法判断即 ask"的硬规则，无人值守运行时几乎所有动作都会被转为 deny，这个形态的基线测不出有意义的数字；放宽这条规则又会削弱安全设计。因此以门面的首个完整运行作为基线，之后的版本用 `run_grok.py --baseline <summary.json>` 计算步数与 token 的变化，9.4 中"比基线 −20% / −30%"以此为准。
+**与原计划的差异**：Phase 1 的"子 agent 直连 `cua`"形态没有单独交付。guard 无法从 Cua 原生工具的参数（pid、window_id、坐标）判断目标，按"无法判断即 ask"的硬规则，无人值守运行时几乎所有动作都会被转为 deny，这个形态的基线测不出有意义的数字；放宽这条规则又会削弱安全设计。因此以门面的首个完整运行作为基线，之后的版本用 `run_grok.py --baseline <summary.json>` 计算步数、token 与带图观测数（`avg_images`）的变化。9.4 中"比基线 −20% / −30%"以此为准。带图观测 ≤ 基线 50% 是少截图重构的实机验收，由 harness 报告 `images_delta`，不写入 `phase2_met`。首个 macOS 基线仍未记录。
 
 ---
 
@@ -781,6 +805,7 @@ e15 button      "Save"                     [1100,740,80,28]
 | V14 | （实现新增）Cua Driver 元素 `frame` 所在的坐标空间 | 窗口不在屏幕原点时比较元素 frame 与窗口边界 | 用 `GROK_COMPUTER_CUA_FRAME_SPACE` 固定 | 待运行。门面按 frame 落点自动判定 |
 | V15 | （实现新增）宿主是否把 `structuredContent` 也交给模型 | 探针 `structured`：码只在 structuredContent 中，要求模型改成小写复述（避免把输出里回显的工具结果误判为看到） | 成立：维持文本 + 结构化合计 16 KB；不成立：结构化部分不必计入预算 | 待运行。当前按合计 16 KB 控制 |
 | V16 | （实现新增）Cua Driver 回复的字段名、拒绝码所在位置、CLI 输出形状 | 对真实驱动调用 `get_window_state` 等，与 `backend/cua_parse.py` 中的 V16 注释对照 | 按实际格式收窄解析器 | 待运行。解析器兼容多种位置与可选字段 |
+| V17 | （实现新增）元素是否带 `expanded`、`min_value` / `min` / `minimum`、`max_value` / `max` / `maximum`、`placeholder` / `placeholder_value` | 对真实驱动调用 `get_window_state`，对照 `backend/cua_elements.py` 的 V17 注释 | 字段缺失时该行与现在一致，不猜测数值 | 待运行。字段出现时滑块渲染 `值 (min–max)`，disclosure 渲染 `expanded` / `collapsed`，空输入框渲染 `placeholder:"…"` |
 
 **探针用法**：`uv run python eval/phase0/run_probes.py --out <目录> --model grok-build-0.1 --model grok-4.7 --sandbox workspace`。运行器在临时工作区以项目级插件安装探针插件（不改用户的 grok 配置），每个探针一次 `grok -p` 会话（会产生少量费用），结束后导出本地 trace（`--local`，不上传）与会话记录，`analyze.py` 生成 `report.md`（PASS / FAIL / UNKNOWN / MANUAL）。结果回填本表与 `docs/phase0-verification.md`；某项确认或被否定后，同时更新代码中的 `V<n>` 注释与预案路径。
 
@@ -1483,4 +1508,5 @@ ask = ["MCPTool(computer__drag)"]
 | UI-TARS Desktop / 模型 | https://github.com/bytedance/UI-TARS-desktop |
 | Agent S | https://github.com/simular-ai/Agent-S |
 | self-operating-computer | https://github.com/OthersideAI/self-operating-computer |
+| Windows-MCP | https://github.com/CursorTouch/Windows-MCP |
 | MCP 规范 | https://modelcontextprotocol.io |

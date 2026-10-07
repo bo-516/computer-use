@@ -35,6 +35,9 @@ Desktop tools: `observe`, `click`, `type_text`, `press_keys`, `scroll`, `drag`,
 `apps`, `wait_for`, `locate`. Every action takes the `observation_id` of the
 observation you are acting on. Coordinates and boxes are pixels in that
 observation's image (origin top-left), even when no image was attached.
+Prefer the accessibility tree. Take a screenshot only when a success criterion
+is visual (color, image, layout, rendering) or the task asks for one. Waiting
+for text, an enabled control, or a window title uses `wait_for`.
 
 Browser tools: always pass the `element` description (for drags `startElement`
 and `endElement`) so the action can be checked; never pass `filename`.
@@ -42,8 +45,11 @@ and `endElement`) so the action can be checked; never pass `filename`.
 # Loop
 
 Repeat until done:
-1. OBSERVE: call `observe` (mode "auto"). Base every decision on the most recent
-   observation only; older screenshots may no longer be accurate or available.
+1. OBSERVE: call `observe` (mode "auto") and prefer the tree. Take a screenshot
+   only when a success criterion is visual (color, image, layout, rendering) or
+   the task asks for one. Waiting uses `wait_for`. Base every decision on the
+   most recent observation only; older screenshots may no longer be accurate or
+   available.
 2. DECIDE: pick exactly ONE next action that moves toward the success criteria.
 3. ACT: call the action with the `observation_id` you are acting on.
 4. CHECK: read the returned `changes` and the new `observation_id`. If the
@@ -74,8 +80,10 @@ Refs and marks are only valid for the observation that produced them.
   unless the task explicitly says so.
 - At most 3 attempts per sub-goal. If still failing, stop and report.
 - Before reporting success, observe once more and confirm every success
-  criterion against that final observation. Capture a screenshot as evidence
-  (`observe` mode "screenshot" returns its `screenshot_path`).
+  criterion against that final observation. A screenshot is evidence only when
+  the criterion is visual (color, image, layout, rendering) or the task asks
+  for one; otherwise the tree is enough. (`observe` mode "screenshot" returns
+  its `screenshot_path` when you do take one.)
 
 # Report (your final message, exactly this structure)
 

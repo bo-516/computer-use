@@ -70,7 +70,9 @@ class ObserveIn(_Strict):
                                         "the frontmost app")
     window_id: int | None = Field(default=None, description="Window from apps(action='windows')")
     mode: Literal["auto", "tree", "screenshot", "som"] = Field(
-        default="auto", description="auto: tree, or Set-of-Mark screenshot when the tree is thin")
+        default="auto",
+        description="auto: tree when usable (a dialog with text stays tree); Set-of-Mark only "
+                    "when empty, thin and textless, degraded, or a poor-accessibility app")
     scope: Literal["window", "screen"] = Field(
         default="window", description="screen only for cross-app work (deny-listed apps masked)")
     root_ref: str | None = Field(default=None, pattern=REF,
@@ -176,15 +178,23 @@ class WaitForIn(_Strict):
     ref_role: str | None = Field(default=None, max_length=40,
                                  description="Only elements of this role (e.g. 'button')")
     gone: bool = Field(default=False, description="Wait until the element disappears instead")
+    enabled: bool | None = Field(
+        default=None,
+        description="When true, wait until any match is enabled. False or omitted does not filter.")
+    title: str | None = Field(
+        default=None, max_length=NAME_MAX_CHARS,
+        description="Wait until the window title contains this")
     app: str | None = Field(default=None, max_length=NAME_MAX_CHARS)
     window_id: int | None = None
     timeout_ms: int = Field(default=WAIT_FOR_DEFAULT_MS, ge=WAIT_FOR_MIN_MS, le=WAIT_FOR_MAX_MS)
 
     @model_validator(mode="after")
     def _condition(self) -> WaitForIn:
-        """Need something to wait for."""
-        if not self.text and not self.ref_role:
-            raise ValueError("give text, ref_role, or both")
+        """Need something to wait for, and do not mix ``enabled`` with ``gone``."""
+        if self.enabled is not None and self.gone:
+            raise ValueError("enabled cannot be combined with gone")
+        if not self.text and not self.ref_role and not (self.title and self.title.strip()):
+            raise ValueError("give text, ref_role, or title")
         return self
 
 

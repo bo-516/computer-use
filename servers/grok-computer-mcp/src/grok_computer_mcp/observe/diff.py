@@ -10,8 +10,10 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from ..limits import ACTION_SUMMARY_MAX_BYTES, SUMMARY_MAX_CHARS
+from ..limits import ACTION_SUMMARY_MAX_BYTES, DIFF_TEXT_MAX_CHARS, SUMMARY_MAX_CHARS
 from .elements import ObservedElement
+from .roles import TEXT_DATA_ROLES
+from .textsel import text_body
 from .tree import clip
 
 Change = dict[str, object]
@@ -73,6 +75,81 @@ def element_changes(before: Sequence[ObservedElement],
             changes.append({"ref": el.ref, "kind": kind, "role": el.role, "label": el.label})
         if len(items) > LIST_LIMIT:
             changes.append({"kind": f"{kind}_more", "count": len(items) - LIST_LIMIT})
+    return changes
+
+
+def _shown_text(elements: Sequence[ObservedElement]) -> list[str]:
+    """Clipped static lines in document order, secrets omitted.
+
+    Comparison is by the displayed string, not by ref. A hidden credential line is skipped
+    so the secret never appears in ``text_appeared``.
+    """
+    shown: list[str] = []
+    for el in elements:
+        if el.role not in TEXT_DATA_ROLES or el.interactive or el.hidden_text:
+            continue
+        body = text_body(el, DIFF_TEXT_MAX_CHARS)
+        if body:
+            shown.append(body)
+    return shown
+
+
+def text_changes(before: Sequence[ObservedElement],
+                 after: Sequence[ObservedElement]) -> list[Change]:
+    """Static lines that appeared or disappeared, matched by text rather than ref.
+
+    Args:
+        before: Elements of the observation the action used.
+        after: Elements observed after the action.
+
+    Returns:
+        Up to ``LIST_LIMIT`` ``text_appeared`` entries (document order of ``after``) then up
+        to ``LIST_LIMIT`` ``text_gone`` entries (document order of ``before``). Each text is
+        clipped to ``DIFF_TEXT_MAX_CHARS``.
+    """
+    old = _shown_text(before)
+    new = _shown_text(after)
+    old_set = set(old)
+    new_set = set(new)
+    appeared = [text for text in new if text not in old_set]
+    gone = [text for text in old if text not in new_set]
+    changes: list[Change] = []
+    for text in appeared[:LIST_LIMIT]:
+        changes.append({"kind": "text_appeared", "text": text})
+    for text in gone[:LIST_LIMIT]:
+        changes.append({"kind": "text_gone", "text": text})
+    return changes
+
+
+def dialog_changes(before: Sequence[ObservedElement],
+                   after: Sequence[ObservedElement]) -> list[Change]:
+    """Visible dialogs that opened or closed.
+
+    Args:
+        before: Elements of the observation the action used.
+        after: Elements observed after the action.
+
+    Returns:
+        ``dialog_opened`` / ``dialog_closed`` with ``ref`` and ``label``, at most
+        ``LIST_LIMIT`` of each. A dialog is not interactive, so it is not also an
+        ``appeared`` element change. Its buttons are.
+    """
+    old = {el.ref: el for el in before if el.role == "dialog" and el.visible}
+    new = [el for el in after if el.role == "dialog" and el.visible]
+    new_refs = {el.ref for el in new}
+    changes: list[Change] = []
+    for el in new:
+        if el.ref not in old:
+            changes.append({"kind": "dialog_opened", "ref": el.ref, "label": el.label})
+        if len([c for c in changes if c["kind"] == "dialog_opened"]) >= LIST_LIMIT:
+            break
+    closed = 0
+    for el in before:
+        if el.role == "dialog" and el.visible and el.ref not in new_refs:
+            changes.append({"kind": "dialog_closed", "ref": el.ref, "label": el.label})
+            closed += 1
+            if closed >= LIST_LIMIT:
+                break
     return changes
 
 

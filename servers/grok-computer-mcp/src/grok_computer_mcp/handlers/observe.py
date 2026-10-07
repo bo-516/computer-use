@@ -1,34 +1,33 @@
-"""``observe`` and ``wait_for`` (goal.md §5.4, §5.5, §5.7).
+"""``observe`` (goal.md §5.4, §5.5, §5.7).
 
-Boundary: I/O orchestration over the backend. ``observe(mode="auto")`` reads the tree and returns
-it when it has at least three interactive elements and the app is not on the thin-accessibility
-list; otherwise it captures and returns a Set-of-Mark screenshot. ``scope="screen"`` lists the
-visible windows over a display screenshot in which deny-listed windows are masked.
+Boundary: I/O orchestration over the backend. ``observe(mode="auto")`` stays on the tree when the
+counted visible controls are three or more, or one or two with at least one static text line.
+The count is the visible dialog's subtree when one is open. A poor-accessibility app, an
+incomplete tree, zero controls, or a thin tree with no text still captures a Set-of-Mark
+screenshot. ``scope="screen"`` lists the visible windows over a display screenshot in which
+deny-listed windows are masked. ``wait_for`` lives in ``handlers/wait.py``.
 """
 
 from __future__ import annotations
 
-import time
-
-import anyio
-
-from ..backend.base import BackendError, RawElement, WindowSnapshot
+from ..backend.base import BackendError, RawElement
 from ..coords import Space, make_frame, rect_to_image
 from ..errors import ErrorCode, FacadeError
 from ..geometry import Rect
-from ..limits import AUTO_MODE_MIN_INTERACTIVE, DEFAULT_MAX_ELEMENTS, WAIT_FOR_POLL_S
-from ..models.inputs import ObserveIn, WaitForIn
-from ..models.outputs import WaitResult
+from ..limits import AUTO_MODE_MIN_INTERACTIVE
+from ..models.inputs import ObserveIn
 from ..observe import capture as capture_mod
+from ..observe.elements import ObservedElement
 from ..observe.fingerprint import dhash, tree_fingerprint
-from ..observe.roles import normalize_role
+from ..observe.sections import modal_root
 from ..observe.som import draw_marks, marks_for
-from ..observe.tree import build_elements
+from ..observe.textsel import text_candidates
+from ..observe.tree import build_elements, subtree
 from ..safety.policy import SafetyRules
 from ..session import Observation, now
 from .context import FacadeContext, ToolOutput, map_backend_error
 from .observing import Built, build, check_allowed, read, resolve_window
-from .results import element_out, observe_output
+from .results import observe_output
 
 SCREEN_APP = "(screen)"
 HIDDEN_LABEL = "(hidden by policy)"
@@ -47,6 +46,32 @@ def _notes(built: Built, extra: list[str]) -> list[str]:
         notes.append(f"-- marks page shown; {built.mark_pages} pages: observe(mode='som', "
                      "page=N) for more --")
     return notes
+
+
+def _auto_thin(elements: list[ObservedElement], app: str, rules: SafetyRules,
+               degraded: str | None) -> tuple[bool, int]:
+    """Whether auto mode should attach a Set-of-Mark image, and how many controls counted.
+
+    Args:
+        elements: The tree-mode observation.
+        app: Front app name (poor-accessibility list).
+        rules: Safety rules.
+        degraded: Backend incomplete-tree reason, or None.
+
+    Returns:
+        ``(thin, interactive)``. ``interactive`` is the visible dialog subtree when a dialog
+        is open, otherwise the whole window. Thin when that count is 0, when it is under 3
+        and there is no static text line, when the app is poor-AX, or when the tree is
+        incomplete. One or two controls plus a text line stay on the tree.
+    """
+    modal = modal_root(elements)
+    scope_ref = modal.ref if modal else None
+    scope = subtree(elements, scope_ref) if scope_ref else elements
+    interactive = sum(1 for el in scope if el.interactive and el.visible)
+    has_text = bool(text_candidates(elements, scope_ref=scope_ref, include_offscreen=False))
+    poor = rules.poor_ax(app) or degraded is not None
+    sparse = interactive < AUTO_MODE_MIN_INTERACTIVE and not has_text
+    return poor or interactive == 0 or sparse, interactive
 
 
 async def observe(ctx: FacadeContext, inp: ObserveIn) -> ToolOutput:
@@ -72,9 +97,7 @@ async def observe(ctx: FacadeContext, inp: ObserveIn) -> ToolOutput:
     extra: list[str] = []
     if inp.mode == "auto":
         built = await build(ctx, rules, snapshot, mode="tree")
-        interactive = sum(1 for el in built.obs.elements if el.interactive and el.visible)
-        thin = (interactive < AUTO_MODE_MIN_INTERACTIVE or rules.poor_ax(window.app)
-                or snapshot.degraded is not None)
+        thin, interactive = _auto_thin(built.obs.elements, window.app, rules, snapshot.degraded)
         if thin:
             snapshot = await read(ctx, window, screenshot=True)
             check_allowed(rules, snapshot.window)
@@ -139,61 +162,3 @@ async def _observe_screen(ctx: FacadeContext, rules: SafetyRules, inp: ObserveIn
     return observe_output(obs, built.image, max_elements=inp.max_elements,
                           root_ref=inp.root_ref, mark_pages=built.mark_pages,
                           notes=_notes(built, notes))
-
-
-def _matches(snapshot: WindowSnapshot, needle: str | None, role: str | None) -> RawElement | None:
-    """First raw element matching the wait condition."""
-    for el in snapshot.elements:
-        if role and normalize_role(el.role, el.subrole) != role:
-            continue
-        haystack = f"{el.label} {el.value or ''}".casefold()
-        if needle and needle not in haystack:
-            continue
-        return el
-    return None
-
-
-async def wait_for(ctx: FacadeContext, inp: WaitForIn) -> ToolOutput:
-    """Poll the window until an element appears (or disappears).
-
-    Args:
-        ctx: Facade context.
-        inp: Validated arguments.
-
-    Returns:
-        The observation in which the condition held.
-
-    Raises:
-        FacadeError: ``TIMEOUT`` when the condition does not hold in time, plus the usual
-            policy, lock, deny-list and backend failures.
-    """
-    rules = await ctx.begin()
-    window = await resolve_window(ctx, rules, inp.app, inp.window_id)
-    role = normalize_role(inp.ref_role) if inp.ref_role else None
-    needle = inp.text.casefold() if inp.text else None
-    start = time.monotonic()
-    deadline = start + inp.timeout_ms / 1000
-    while True:
-        ctx.check_stop()
-        snapshot = await read(ctx, window, screenshot=False)
-        check_allowed(rules, snapshot.window)
-        hit = _matches(snapshot, needle, role)
-        if (hit is None) == inp.gone:
-            built = await build(ctx, rules, snapshot, mode="tree")
-            ctx.state.write(built.obs, explicit_observation=True)
-            waited = int((time.monotonic() - start) * 1000)
-            out = observe_output(built.obs, None, max_elements=DEFAULT_MAX_ELEMENTS,
-                                 notes=[f"wait_for: condition met after {waited} ms"])
-            matched = next((el for el in built.obs.elements if hit and el.index == hit.index), None)
-            result = WaitResult.model_validate(
-                {**out.structured, "waited_ms": waited,
-                 "matched": element_out(matched) if matched else None})
-            structured: dict[str, object] = result.model_dump(mode="json", exclude_defaults=True)
-            structured["ok"] = True
-            return ToolOutput(structured, out.text, None)
-        if time.monotonic() >= deadline:
-            what = inp.text or inp.ref_role
-            verb = "disappear" if inp.gone else "appear"
-            raise FacadeError(ErrorCode.TIMEOUT,
-                              f"'{what}' did not {verb} within {inp.timeout_ms} ms.")
-        await anyio.sleep(WAIT_FOR_POLL_S)

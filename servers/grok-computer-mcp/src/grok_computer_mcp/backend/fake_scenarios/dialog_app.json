@@ -1,0 +1,911 @@
+{
+ "displays": [
+  {
+   "id": "main",
+   "bounds": [
+    0,
+    0,
+    1600,
+    1200
+   ],
+   "scale": 1.0,
+   "origin_px": [
+    0,
+    0
+   ]
+  }
+ ],
+ "apps": [
+  {
+   "name": "Alerts",
+   "pid": 9101,
+   "bundle_id": "com.example.alerts",
+   "windows": [
+    {
+     "title": "Notice",
+     "bounds": [
+      0,
+      0,
+      1280,
+      800
+     ],
+     "root": {
+      "id": "win",
+      "role": "AXWindow",
+      "label": "Notice",
+      "frame": [
+       0,
+       0,
+       1280,
+       800
+      ],
+      "children": [
+       {
+        "id": "notice",
+        "role": "AXSheet",
+        "label": "Notice",
+        "frame": [
+         340,
+         240,
+         400,
+         160
+        ],
+        "children": [
+         {
+          "id": "body",
+          "role": "AXStaticText",
+          "label": "The file is ready.",
+          "frame": [
+           360,
+           280,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "ok",
+          "role": "AXButton",
+          "label": "OK",
+          "frame": [
+           500,
+           340,
+           80,
+           28
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "Blank",
+   "pid": 9102,
+   "bundle_id": "com.example.blank",
+   "windows": [
+    {
+     "title": "Blank",
+     "bounds": [
+      0,
+      0,
+      1280,
+      800
+     ],
+     "root": {
+      "id": "win",
+      "role": "AXWindow",
+      "label": "Blank",
+      "frame": [
+       0,
+       0,
+       1280,
+       800
+      ],
+      "children": [
+       {
+        "id": "only",
+        "role": "AXStaticText",
+        "label": "Nothing to click",
+        "frame": [
+         40,
+         40,
+         300,
+         20
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "Layers",
+   "pid": 9103,
+   "bundle_id": "com.example.layers",
+   "windows": [
+    {
+     "title": "Layers",
+     "bounds": [
+      0,
+      0,
+      1280,
+      800
+     ],
+     "root": {
+      "id": "win",
+      "role": "AXWindow",
+      "label": "Layers",
+      "frame": [
+       0,
+       0,
+       1280,
+       800
+      ],
+      "children": [
+       {
+        "id": "bg",
+        "role": "AXButton",
+        "label": "Background",
+        "frame": [
+         40,
+         40,
+         140,
+         28
+        ]
+       },
+       {
+        "id": "first",
+        "role": "AXSheet",
+        "label": "First",
+        "frame": [
+         200,
+         80,
+         300,
+         140
+        ],
+        "children": [
+         {
+          "id": "one",
+          "role": "AXButton",
+          "label": "One",
+          "frame": [
+           220,
+           140,
+           80,
+           28
+          ]
+         },
+         {
+          "id": "first_body",
+          "role": "AXStaticText",
+          "label": "first body",
+          "frame": [
+           220,
+           110,
+           200,
+           18
+          ]
+         }
+        ]
+       },
+       {
+        "id": "second",
+        "role": "AXSheet",
+        "label": "Second",
+        "frame": [
+         560,
+         80,
+         300,
+         140
+        ],
+        "children": [
+         {
+          "id": "two",
+          "role": "AXButton",
+          "label": "Two",
+          "frame": [
+           580,
+           140,
+           80,
+           28
+          ]
+         },
+         {
+          "id": "second_body",
+          "role": "AXStaticText",
+          "label": "second body",
+          "frame": [
+           580,
+           110,
+           200,
+           18
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "Editor",
+   "pid": 9104,
+   "bundle_id": "com.example.editor",
+   "windows": [
+    {
+     "title": "Report",
+     "bounds": [
+      0,
+      0,
+      1280,
+      800
+     ],
+     "root": {
+      "id": "win",
+      "role": "AXWindow",
+      "label": "Report",
+      "frame": [
+       0,
+       0,
+       1280,
+       800
+      ],
+      "children": [
+       {
+        "id": "profile",
+        "role": "AXGroup",
+        "label": "Profile",
+        "frame": [
+         20,
+         20,
+         420,
+         250
+        ],
+        "children": [
+         {
+          "id": "tokens",
+          "role": "AXStaticText",
+          "label": "Token count: 3",
+          "frame": [
+           40,
+           40,
+           240,
+           18
+          ]
+         },
+         {
+          "id": "secret",
+          "role": "AXStaticText",
+          "label": "API token",
+          "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "frame": [
+           40,
+           62,
+           360,
+           18
+          ]
+         },
+         {
+          "id": "search",
+          "role": "AXButton",
+          "label": "Search",
+          "frame": [
+           40,
+           90,
+           120,
+           28
+          ],
+          "on_click": [
+           "set_value:status:searched"
+          ]
+         },
+         {
+          "id": "glyph",
+          "role": "AXButton",
+          "label": "",
+          "frame": [
+           170,
+           90,
+           28,
+           28
+          ]
+         },
+         {
+          "id": "volume",
+          "role": "AXSlider",
+          "label": "Volume",
+          "value": "50",
+          "min_value": 0,
+          "max_value": 100,
+          "frame": [
+           40,
+           130,
+           220,
+           24
+          ]
+         },
+         {
+          "id": "more",
+          "role": "AXDisclosureTriangle",
+          "label": "More",
+          "expanded": false,
+          "frame": [
+           40,
+           164,
+           80,
+           20
+          ]
+         },
+         {
+          "id": "nick",
+          "role": "AXTextField",
+          "label": "Nickname",
+          "value": "",
+          "placeholder": "Optional",
+          "frame": [
+           40,
+           194,
+           220,
+           24
+          ]
+         },
+         {
+          "id": "note",
+          "role": "AXTextField",
+          "label": "Note",
+          "value": "",
+          "frame": [
+           40,
+           224,
+           220,
+           24
+          ]
+         }
+        ]
+       },
+       {
+        "id": "recent",
+        "role": "AXList",
+        "label": "Recent files",
+        "frame": [
+         20,
+         280,
+         400,
+         400
+        ],
+        "children": [
+         {
+          "id": "file0",
+          "role": "AXRow",
+          "label": "file-00.txt",
+          "frame": [
+           60,
+           100,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "file1",
+          "role": "AXRow",
+          "label": "file-01.txt",
+          "frame": [
+           60,
+           122,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "file2",
+          "role": "AXRow",
+          "label": "file-02.txt",
+          "frame": [
+           60,
+           144,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "file3",
+          "role": "AXRow",
+          "label": "file-03.txt",
+          "frame": [
+           60,
+           166,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "file4",
+          "role": "AXRow",
+          "label": "file-04.txt",
+          "frame": [
+           60,
+           188,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "file5",
+          "role": "AXRow",
+          "label": "file-05.txt",
+          "frame": [
+           60,
+           210,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "file6",
+          "role": "AXRow",
+          "label": "file-06.txt",
+          "frame": [
+           60,
+           232,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "file7",
+          "role": "AXRow",
+          "label": "file-07.txt",
+          "frame": [
+           60,
+           254,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "file8",
+          "role": "AXRow",
+          "label": "file-08.txt",
+          "frame": [
+           60,
+           276,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "file9",
+          "role": "AXRow",
+          "label": "file-09.txt",
+          "frame": [
+           60,
+           298,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "virt0",
+          "role": "AXRow",
+          "label": "virt-00.txt",
+          "frame": [
+           60,
+           820,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt1",
+          "role": "AXRow",
+          "label": "virt-01.txt",
+          "frame": [
+           60,
+           822,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt2",
+          "role": "AXRow",
+          "label": "virt-02.txt",
+          "frame": [
+           60,
+           824,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt3",
+          "role": "AXRow",
+          "label": "virt-03.txt",
+          "frame": [
+           60,
+           826,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt4",
+          "role": "AXRow",
+          "label": "virt-04.txt",
+          "frame": [
+           60,
+           828,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt5",
+          "role": "AXRow",
+          "label": "virt-05.txt",
+          "frame": [
+           60,
+           830,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt6",
+          "role": "AXRow",
+          "label": "virt-06.txt",
+          "frame": [
+           60,
+           832,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt7",
+          "role": "AXRow",
+          "label": "virt-07.txt",
+          "frame": [
+           60,
+           834,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt8",
+          "role": "AXRow",
+          "label": "virt-08.txt",
+          "frame": [
+           60,
+           836,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt9",
+          "role": "AXRow",
+          "label": "virt-09.txt",
+          "frame": [
+           60,
+           838,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt10",
+          "role": "AXRow",
+          "label": "virt-10.txt",
+          "frame": [
+           60,
+           840,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt11",
+          "role": "AXRow",
+          "label": "virt-11.txt",
+          "frame": [
+           60,
+           842,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt12",
+          "role": "AXRow",
+          "label": "virt-12.txt",
+          "frame": [
+           60,
+           844,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt13",
+          "role": "AXRow",
+          "label": "virt-13.txt",
+          "frame": [
+           60,
+           846,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt14",
+          "role": "AXRow",
+          "label": "virt-14.txt",
+          "frame": [
+           60,
+           848,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt15",
+          "role": "AXRow",
+          "label": "virt-15.txt",
+          "frame": [
+           60,
+           850,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt16",
+          "role": "AXRow",
+          "label": "virt-16.txt",
+          "frame": [
+           60,
+           852,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt17",
+          "role": "AXRow",
+          "label": "virt-17.txt",
+          "frame": [
+           60,
+           854,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt18",
+          "role": "AXRow",
+          "label": "virt-18.txt",
+          "frame": [
+           60,
+           856,
+           300,
+           1
+          ]
+         },
+         {
+          "id": "virt19",
+          "role": "AXRow",
+          "label": "virt-19.txt",
+          "frame": [
+           60,
+           858,
+           300,
+           1
+          ]
+         }
+        ]
+       },
+       {
+        "id": "inbox",
+        "role": "AXList",
+        "label": "Inbox",
+        "frame": [
+         460,
+         40,
+         400,
+         200
+        ],
+        "children": [
+         {
+          "id": "mail0",
+          "role": "AXRow",
+          "label": "mail-00.txt",
+          "frame": [
+           60,
+           100,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "mail1",
+          "role": "AXRow",
+          "label": "mail-01.txt",
+          "frame": [
+           60,
+           122,
+           300,
+           20
+          ]
+         },
+         {
+          "id": "mail2",
+          "role": "AXRow",
+          "label": "mail-02.txt",
+          "frame": [
+           60,
+           144,
+           300,
+           20
+          ]
+         }
+        ]
+       },
+       {
+        "id": "submit",
+        "role": "AXButton",
+        "label": "Submit",
+        "enabled": false,
+        "frame": [
+         460,
+         260,
+         100,
+         28
+        ]
+       },
+       {
+        "id": "arm",
+        "role": "AXButton",
+        "label": "Arm",
+        "frame": [
+         580,
+         260,
+         80,
+         28
+        ],
+        "on_click": [
+         "enable:submit",
+         "set_title:Report — Edited"
+        ]
+       },
+       {
+        "id": "flag",
+        "role": "AXCheckBox",
+        "label": "Flag",
+        "value": "0",
+        "frame": [
+         460,
+         300,
+         80,
+         22
+        ]
+       },
+       {
+        "id": "status",
+        "role": "AXStaticText",
+        "label": "Status",
+        "value": "",
+        "frame": [
+         460,
+         340,
+         400,
+         20
+        ]
+       },
+       {
+        "id": "unsaved",
+        "role": "AXStaticText",
+        "label": "Unsaved changes",
+        "frame": [
+         460,
+         366,
+         240,
+         18
+        ]
+       },
+       {
+        "id": "save",
+        "role": "AXButton",
+        "label": "Save",
+        "frame": [
+         460,
+         400,
+         80,
+         28
+        ],
+        "on_click": [
+         "set_value:flag:1",
+         "set_value:status:Changes saved",
+         "hide:unsaved",
+         "show:sheet"
+        ]
+       },
+       {
+        "id": "ping",
+        "role": "AXButton",
+        "label": "Ping",
+        "frame": [
+         560,
+         400,
+         80,
+         28
+        ],
+        "on_click": [
+         "set_value:status:pong"
+        ]
+       },
+       {
+        "id": "sheet",
+        "role": "AXSheet",
+        "label": "Delete file?",
+        "visible": false,
+        "frame": [
+         300,
+         200,
+         480,
+         180
+        ],
+        "children": [
+         {
+          "id": "sheet_body",
+          "role": "AXStaticText",
+          "label": "report.md will be moved to the Trash.",
+          "frame": [
+           320,
+           240,
+           420,
+           20
+          ]
+         },
+         {
+          "id": "cancel",
+          "role": "AXButton",
+          "label": "Cancel",
+          "frame": [
+           480,
+           320,
+           100,
+           28
+          ],
+          "on_click": [
+           "hide:sheet"
+          ]
+         },
+         {
+          "id": "delete",
+          "role": "AXButton",
+          "label": "Delete",
+          "frame": [
+           600,
+           320,
+           100,
+           28
+          ],
+          "on_click": [
+           "hide:sheet"
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     "focused": "nick"
+    }
+   ]
+  }
+ ]
+}

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import cast
 
 import pytest
@@ -27,6 +28,38 @@ def box_of(result: Result, label: str) -> list[int]:
         if el["label"] == label:
             return cast(list[int], el["bbox"])
     raise AssertionError(label)
+
+
+async def test_save_reports_text_and_dialog_changes(dialogs: Facade) -> None:
+    obs = await dialogs.call("observe", {"app": "Editor"})
+    assert not obs.is_error, obs.text
+    flag = ref_of(obs, "Flag")
+    saved = await dialogs.call("click", {"observation_id": obs.obs, "ref": ref_of(obs, "Save")})
+    assert not saved.is_error, saved.text
+    changes = cast(list[dict[str, object]], saved.structured["changes"])
+    assert {"ref": flag, "field": "value", "before": "0", "after": "1"} in changes
+    assert {"kind": "text_appeared", "text": "Changes saved"} in changes
+    opened = [c for c in changes if c.get("kind") == "dialog_opened"]
+    assert any(c.get("label") == "Delete file?" for c in opened)
+    assert len(json.dumps(changes).encode()) <= 2048
+    delete = next(c["ref"] for c in changes
+                  if c.get("kind") == "appeared" and c.get("label") == "Delete")
+    closed = await dialogs.call("click", {"observation_id": saved.obs, "ref": str(delete)})
+    assert not closed.is_error, closed.text
+    closed_changes = cast(list[dict[str, object]], closed.structured["changes"])
+    assert any(c.get("kind") == "dialog_closed" and c.get("label") == "Delete file?"
+               for c in closed_changes)
+    again = await dialogs.call("observe", {"app": "Editor"})
+    saved_again = await dialogs.call(
+        "click", {"observation_id": again.obs, "ref": ref_of(again, "Save")})
+    assert not saved_again.is_error, saved_again.text
+    opened = await dialogs.call("observe", {"app": "Editor"})
+    assert "modal=" in opened.text and "Ping" not in opened.text
+    state = dialogs.state()
+    recorded = cast(dict[str, dict[str, object]], state["elements"])
+    ping = next(ref for ref, el in recorded.items() if el.get("label") == "Ping")
+    background = await dialogs.call("click", {"observation_id": opened.obs, "ref": ping})
+    assert not background.is_error, background.text
 
 
 async def test_click_ref_reports_value_change_and_next_observation(facade: Facade) -> None:

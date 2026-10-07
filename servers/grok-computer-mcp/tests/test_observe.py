@@ -10,6 +10,7 @@ import pytest
 from facade_helpers import Facade, Result
 from PIL import Image
 
+from grok_computer_mcp.backend.base import BackendErrorKind
 from grok_computer_mcp.limits import TARGET_IMAGE_BYTES, TOOL_TEXT_MAX_BYTES
 from grok_computer_mcp.observe.capture import MASK_FILL
 
@@ -150,6 +151,96 @@ async def test_wait_for_appearing_and_gone(facade: Facade) -> None:
 async def test_wait_for_needs_a_condition(facade: Facade) -> None:
     result = await facade.call("wait_for", {"app": "MyApp"})
     assert result.code == "INVALID_ARGUMENT"
+    mixed = await facade.call(
+        "wait_for", {"app": "MyApp", "text": "Save", "enabled": True, "gone": True}
+    )
+    assert mixed.code == "INVALID_ARGUMENT"
+
+
+async def test_tree_groups_containers_and_skips_empty_ones(facade: Facade) -> None:
+    result = await facade.observe(mode="tree")
+    assert 'group "Profile"' in result.text
+    assert "Unused" not in result.text
+    assert 'text "Save"' not in result.text
+    assert "placeholder:" not in result.text
+    assert "(0\u2013" not in result.text
+
+
+async def test_auto_stays_on_tree_for_a_one_button_dialog(dialogs: Facade) -> None:
+    rich = await dialogs.call("observe", {"app": "Alerts", "mode": "auto"})
+    assert not rich.is_error, rich.text
+    assert rich.structured["mode"] == "tree" and rich.images == []
+    assert "modal=" in rich.text and "The file is ready." in rich.text
+    blank = await dialogs.call("observe", {"app": "Blank", "mode": "auto"})
+    assert blank.structured["mode"] == "som" and len(blank.images) == 1
+
+
+async def test_incomplete_tree_still_screenshots(facade: Facade) -> None:
+    facade.backend.window("Settings").degraded = "incomplete"
+    result = await facade.observe(mode="auto")
+    assert result.structured["mode"] == "som" and result.images
+
+
+async def test_modal_lists_only_the_last_dialog(dialogs: Facade) -> None:
+    result = await dialogs.call("observe", {"app": "Layers", "mode": "tree"})
+    assert not result.is_error, result.text
+    assert 'dialog "Second"' in result.text
+    assert 'dialog "First"' not in result.text
+    assert "Background" not in result.text
+    header = result.text.splitlines()[0]
+    assert "modal=" in header
+    footnote = next(line for line in result.text.splitlines()
+                    if "background elements hidden" in line)
+    root = footnote.split("root_ref=", 1)[1].split(")", 1)[0]
+    whole = await dialogs.call("observe", {"app": "Layers", "root_ref": root})
+    assert not whole.is_error, whole.text
+    assert "Background" in whole.text and "One" in whole.text
+    assert "modal=" not in whole.text.splitlines()[0]
+
+
+async def test_editor_shows_scroll_state_and_masks_secrets(dialogs: Facade) -> None:
+    result = await dialogs.call("observe", {"app": "Editor", "mode": "tree"})
+    assert not result.is_error, result.text
+    recent = next(line for line in result.text.splitlines() if "Recent files" in line)
+    inbox = next(line for line in result.text.splitlines() if '"Inbox"' in line)
+    assert "scroll \u21910 \u219320" in recent
+    assert "scroll" not in inbox
+    assert 'text "Token count: 3"' in result.text
+    assert "text (hidden: credential)" in result.text
+    assert "a" * 32 not in result.text
+    assert "50 (0\u2013100)" in result.text
+    assert "collapsed" in result.text
+    assert 'placeholder:"Optional"' in result.text
+    assert "\uE001" not in result.text
+    assert "Search" in result.text
+
+
+async def test_wait_for_enabled(dialogs: Facade) -> None:
+    early = await dialogs.call(
+        "wait_for", {"app": "Editor", "text": "Submit", "enabled": True, "timeout_ms": 400}
+    )
+    assert early.code == "TIMEOUT"
+    obs = await dialogs.call("observe", {"app": "Editor"})
+    arm = next(el for el in elements(obs) if el["label"] == "Arm")
+    await dialogs.call("click", {"observation_id": obs.obs, "ref": arm["ref"]})
+    seen = await dialogs.call(
+        "wait_for", {"app": "Editor", "text": "Submit", "enabled": True, "timeout_ms": 1000}
+    )
+    assert not seen.is_error, seen.text
+    matched = cast(dict[str, object], seen.structured["matched"])
+    assert matched["label"] == "Submit"
+    assert matched.get("enabled", True) is True
+
+
+async def test_wait_for_title_and_closed_window(facade: Facade) -> None:
+    settings = await facade.observe()
+    back = next(el for el in elements(settings) if el["label"] == "Back")
+    await facade.call("click", {"observation_id": settings.obs, "ref": back["ref"]})
+    titled = await facade.call("wait_for", {"app": "MyApp", "title": "Home", "timeout_ms": 1000})
+    assert not titled.is_error, titled.text
+    facade.backend.fail_next("read_window", BackendErrorKind.WINDOW_GONE)
+    closed = await facade.call("wait_for", {"app": "MyApp", "text": "Save", "timeout_ms": 400})
+    assert closed.code == "STALE_OBSERVATION"
 
 
 async def test_apps_list_windows_launch_and_focus(facade: Facade) -> None:

@@ -9,6 +9,7 @@ interactive (listed by default), visible (on the image, not a virtualized 1 px r
 
 from __future__ import annotations
 
+import re
 from collections.abc import Sequence
 
 from ..backend.base import RawElement
@@ -20,18 +21,24 @@ from .elements import ObservedElement
 from .refs import RefAllocator, assign_refs
 from .roles import FORM_INPUT_ROLES, TEXT_ENTRY_ROLES, is_interactive, normalize_role
 
+# Unicode private-use planes plus unpaired surrogates (refactor FR-9). Icon fonts (VS Code and
+# others) store glyphs there; they are not text. A label that becomes empty is unlabeled.
+_PRIVATE_USE = re.compile(
+    "[\uE000-\uF8FF\U000F0000-\U000FFFFD\U00100000-\U0010FFFD\uD800-\uDFFF]"
+)
+
 
 def clip(text: str, limit: int) -> str:
-    """Collapse whitespace and cut to ``limit`` characters with an ellipsis.
+    """Drop private-use characters, collapse whitespace, and cut to ``limit``.
 
     Args:
         text: Any text.
         limit: Maximum characters.
 
     Returns:
-        The clipped text.
+        The clipped text. Empty when nothing remains after cleaning.
     """
-    text = " ".join(text.split())
+    text = " ".join(_PRIVATE_USE.sub("", text).split())
     return text if len(text) <= limit else text[: limit - 1] + "…"
 
 
@@ -63,6 +70,8 @@ def build_elements(raw: Sequence[RawElement], frame: Frame, frame_space: Space,
         secure = role == "securefield" or (
             role in TEXT_ENTRY_ROLES and rules.credential_word(label) is not None)
         parent_pos = by_index.get(el.parent) if el.parent is not None else None
+        # V17: copy optional state only when the backend sent it. None keeps today's line.
+        placeholder = clip(el.placeholder, LABEL_MAX_CHARS) if el.placeholder else None
         out.append(ObservedElement(
             ref=ref_list[pos], index=el.index, handle=el.handle, role=role, raw_role=el.role,
             label=label, value=None if secure else el.value, bbox=box,
@@ -70,6 +79,8 @@ def build_elements(raw: Sequence[RawElement], frame: Frame, frame_space: Space,
             in_form=role in FORM_INPUT_ROLES, enabled=el.enabled, focused=el.focused,
             selected=el.selected,
             parent_ref=ref_list[parent_pos] if parent_pos is not None else None, depth=el.depth,
+            expanded=el.expanded, min_value=el.min_value, max_value=el.max_value,
+            placeholder=placeholder or None,
         ))
     refs.previous = out
     return out

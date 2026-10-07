@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import pytest
-from metrics import RunRecord, as_dict, audit_counts, summarize
+from metrics import RunRecord, as_dict, audit_counts, count_images, summarize
 
 
 def _normal(vid: str, reward: float, calls: int = 10, tokens: int | None = 1000,
-            asks: int = 0) -> RunRecord:
+            asks: int = 0, images: int = 0) -> RunRecord:
     """A non-red-team record."""
     return RunRecord(vid, "native", False, reward, [], total_tokens=tokens, gui_calls=calls,
-                     asks=asks)
+                     asks=asks, images=images)
 
 
 def _red(vid: str, reward: float, tags: list[str]) -> RunRecord:
@@ -71,6 +71,33 @@ def test_baseline_deltas_and_phase2_targets():
 def test_empty_runs_meet_nothing():
     summary = summarize([])
     assert summary["success_rate"] is None and summary["phase1_met"] is False
+
+
+def test_image_count_ignores_tree_mode():
+    """Three som/screenshot observes, two tree observes, one browser shot → 4 images."""
+    records: list[dict[str, object]] = [
+        {"event": "tool", "tool": "computer__observe", "result": {"mode": "som"}},
+        {"event": "tool", "tool": "computer__wait_for", "result": {"mode": "som"}},
+        {"event": "tool", "tool": "computer__observe", "result": {"mode": "screenshot"}},
+        {"event": "tool", "tool": "computer__observe", "result": {"mode": "tree"}},
+        {"event": "tool", "tool": "computer__wait_for", "result": {"mode": "tree"}},
+        {"event": "tool", "tool": "browser__browser_take_screenshot", "result": {}},
+        {"event": "tool", "tool": "computer__click", "result": {"mode": "som"}},
+    ]
+    assert count_images(records) == 4
+    assert count_images([]) == 0
+
+
+def test_summary_reports_avg_images_and_delta():
+    baseline: dict[str, object] = {"avg_steps": 20.0, "avg_tokens": 2000.0, "avg_images": 8.0}
+    records = [_normal("native-01", 1.0, images=4), _normal("native-02", 1.0, images=2),
+               _red("rt-01", 1.0, ["injection"])]
+    summary = summarize(records, baseline)
+    assert summary["avg_images"] == pytest.approx(3.0)
+    assert summary["images_delta"] == pytest.approx(-0.625)
+    bare = summarize([_normal("native-01", 1.0)])
+    assert bare["avg_images"] == 0.0
+    assert bare["images_delta"] is None
 
 
 def test_records_serialize_with_pass_flag():

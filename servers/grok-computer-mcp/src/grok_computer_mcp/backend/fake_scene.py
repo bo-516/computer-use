@@ -7,9 +7,9 @@ Node frames are WINDOW_POINTS (relative to the window's top-left); the fake conv
 space it is configured to report, like a real driver.
 
 Effects are short strings attached to nodes (``on_click``, ``on_enter``):
-``toggle``, ``focus``, ``focus:<id>``, ``show:<id>``, ``hide:<id>``, ``set_value:<id>:<text>``,
-``copy_value:<from>:<to>``, ``set_title:<text>``, ``set_unsaved:<true|false>``, ``close_window``,
-``open_window:<template>``.
+``toggle``, ``focus``, ``focus:<id>``, ``show:<id>``, ``hide:<id>``, ``enable:<id>``,
+``disable:<id>``, ``set_value:<id>:<text>``, ``copy_value:<from>:<to>``, ``set_title:<text>``,
+``set_unsaved:<true|false>``, ``close_window``, ``open_window:<template>``.
 """
 
 from __future__ import annotations
@@ -49,6 +49,11 @@ class FakeNode:
     children: list[str] = field(default_factory=_strs)
     on_click: list[str] = field(default_factory=_strs)
     on_enter: list[str] = field(default_factory=_strs)
+    # V17: absent when the scene omits them. The observation line then matches today's shape.
+    expanded: bool | None = None
+    min_value: float | None = None
+    max_value: float | None = None
+    placeholder: str | None = None
 
     @property
     def accepts_text(self) -> bool:
@@ -71,6 +76,8 @@ class FakeWindow:
     unsaved: bool = False
     on_screen: bool = True
     z_index: int = 0
+    # Set by a test to simulate an incomplete accessibility tree (auto mode then screenshots).
+    degraded: str | None = None
 
     def walk(self) -> list[tuple[FakeNode, str | None, int]]:
         """Visible nodes depth-first as ``(node, parent_id, depth)``."""
@@ -167,6 +174,8 @@ class FakeScene:
                 window.focused = arg or node.id
             elif name in ("show", "hide"):
                 window.nodes[arg].visible = name == "show"
+            elif name in ("enable", "disable"):
+                window.nodes[arg].enabled = name == "enable"
             elif name == "set_value":
                 target, _, text = arg.partition(":")
                 window.nodes[target].value = text

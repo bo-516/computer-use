@@ -23,7 +23,6 @@ from .base import (
     BackendError,
     BackendErrorKind,
     Effect,
-    RawElement,
     WindowInfo,
 )
 from .cua_transport import CuaReply
@@ -121,29 +120,6 @@ def apps_of(structured: JsonObject) -> list[AppInfo]:
     return out
 
 
-def elements_of(structured: JsonObject) -> list[RawElement]:
-    """Elements of a ``get_window_state`` answer, in document order."""
-    out: list[RawElement] = []
-    for pos, rec in enumerate(items(structured.get("elements"))):
-        index = num(rec.get("element_index"))
-        parent = num(rec.get("parent_index"))
-        depth = num(rec.get("depth"))
-        selected = rec.get("selected")
-        actions = [a for a in cast(list[object], rec.get("actions") or [])
-                   if isinstance(a, str)] if isinstance(rec.get("actions"), list) else []
-        value = rec.get("value")
-        out.append(RawElement(
-            index=int(index) if index is not None else pos, role=text(rec.get("role")),
-            label=text(rec.get("label") or rec.get("title")),
-            value=None if value is None else str(value), frame=rect(rec.get("frame")),
-            handle=text(rec.get("element_token")) or None, subrole=text(rec.get("subrole")),
-            enabled=rec.get("enabled", True) is not False, focused=rec.get("focused") is True,
-            selected=selected if isinstance(selected, bool) else None,
-            parent=int(parent) if parent is not None else None,
-            depth=int(depth) if depth is not None else 0, actions=tuple(actions)))
-    return out
-
-
 def _code(reply: CuaReply) -> str:
     """The driver's error/refusal code, wherever it sits (V16)."""
     s = reply.structured
@@ -188,3 +164,25 @@ def outcome_of(structured: JsonObject) -> ActionOutcome:
         path=text(structured.get("path")) or "unknown",
         effect=EFFECTS.get(effect, "unknown"),
         verified=verified if isinstance(verified, bool) else None, escalation=escalation)
+
+
+# Re-export after the helpers exist so ``cua_elements`` can import them without a cycle.
+from .cua_elements import elements_of  # noqa: E402
+
+__all__ = [
+    "CODE_KINDS",
+    "EFFECTS",
+    "PERMISSION_HINTS",
+    "JsonObject",
+    "apps_of",
+    "classify",
+    "elements_of",
+    "items",
+    "num",
+    "obj",
+    "outcome_of",
+    "rect",
+    "text",
+    "window_info",
+    "windows_of",
+]

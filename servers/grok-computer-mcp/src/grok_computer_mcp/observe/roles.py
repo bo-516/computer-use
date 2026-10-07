@@ -60,6 +60,14 @@ TEXT_ENTRY_ROLES = ("textfield", "textarea", "securefield", "searchfield", "comb
 # Text inputs where Enter may submit a form (goal.md §7.3 R2); search fields only search.
 FORM_INPUT_ROLES = ("textfield", "textarea", "securefield", "combobox")
 TOGGLE_ROLES = ("checkbox", "switch", "radio")
+# Named containers the tree view groups interactive rows under (refactor FR-2).
+CONTAINER_ROLES = frozenset((
+    "group", "toolbar", "tablist", "list", "table", "dialog", "menu", "scrollarea", "webarea",
+))
+# Static lines quoted in the tree without a ref (refactor FR-3).
+TEXT_DATA_ROLES = frozenset(("text", "heading", "progress"))
+# Containers that can hide rows above or below a scrollport (refactor FR-6).
+SCROLL_ROLES = frozenset(("scrollarea", "list", "table", "webarea"))
 # Accessibility actions that make an otherwise generic node clickable (web content groups).
 PRESS_ACTIONS = frozenset(("press", "axpress", "click", "invoke", "activate", "pick", "confirm",
                            "open", "showmenu", "axshowmenu"))

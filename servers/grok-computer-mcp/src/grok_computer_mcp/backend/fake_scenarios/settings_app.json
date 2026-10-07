@@ -355,6 +355,14 @@
         "on_click": [
          "set_value:status:Saved",
          "set_unsaved:false"
+        ],
+        "children": [
+         {
+          "id": "save_label",
+          "role": "AXStaticText",
+          "label": "Save",
+          "frame": [1100, 744, 80, 16]
+         }
         ]
        },
        {
@@ -424,6 +432,12 @@
           ]
          }
         ]
+       },
+       {
+        "id": "unused",
+        "role": "AXGroup",
+        "label": "Unused",
+        "frame": [40, 770, 80, 20]
        }
       ]
      }
