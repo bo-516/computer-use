@@ -93,6 +93,26 @@ def test_parse_documented_shapes() -> None:
     )
     assert elements[0].index == 3 and elements[0].handle == "t" and elements[0].value == "5"
     assert elements[1].index == 1 and elements[1].frame is None
+    assert elements[1].expanded is None and elements[1].min_value is None
+    assert elements[1].max_value is None and elements[1].placeholder is None
+    present = elements_of(
+        {
+            "elements": [
+                {
+                    "role": "AXSlider",
+                    "label": "Volume",
+                    "value": "50",
+                    "expanded": False,
+                    "minimum": 0,
+                    "maximum": 100,
+                    "placeholder_value": "n/a",
+                }
+            ]
+        }
+    )
+    assert present[0].expanded is False
+    assert present[0].min_value == 0 and present[0].max_value == 100
+    assert present[0].placeholder == "n/a"
     assert (
         outcome_of(
             {"path": "ax", "effect": "suspected_noop", "escalation": {"recommended": "px"}}

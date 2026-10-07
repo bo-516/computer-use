@@ -99,6 +99,11 @@ class RawElement:
     parent: int | None = None
     depth: int = 0
     actions: tuple[str, ...] = ()
+    # V17: optional. Missing keys stay None; the observation line then matches today's shape.
+    expanded: bool | None = None
+    min_value: float | None = None
+    max_value: float | None = None
+    placeholder: str | None = None
 
 
 @dataclass(frozen=True)

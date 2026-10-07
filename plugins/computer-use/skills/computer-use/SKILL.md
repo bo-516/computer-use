@@ -42,7 +42,7 @@ SUCCESS CRITERIA (observable on screen):
   1. <...>
   2. <...>
 DO NOT: <actions that are out of scope, e.g. do not submit the form, do not change other settings>
-RETURN: the standard report, plus a screenshot of the final state
+RETURN: the standard report. Attach a screenshot of the final state only when a success criterion is visual (color, image, layout, rendering) or the task asks for one.
 ```
 
 ## Reading the report

@@ -42,6 +42,15 @@ SUMMARY_MAX_CHARS = 200
 AUTO_MODE_MIN_INTERACTIVE = 3
 DEFAULT_MAX_ELEMENTS = 150
 MAX_ELEMENTS_LIMIT = 600
+# Static text appended after interactive lines (docs/26-10-07-fewer-screenshots-refactor.md
+# FR-3, NFR-4). Interactive elements keep the rest of the 16 KB budget.
+TEXT_SECTION_MAX_BYTES = 3 * 1024
+TEXT_SECTION_MAX_LINES = 40
+TEXT_LINE_MAX_CHARS = 120
+# Text and dialog entries in an action diff (same doc, FR-7).
+DIFF_TEXT_MAX_CHARS = 80
+# A non-space run at least this long, after a credential label, is treated as a secret (FR-12).
+CREDENTIAL_TOKEN_MIN_CHARS = 16
 # Elements requested from the backend walk (Cua's default cap is 2 000; goal.md §5.5 relies on
 # interactive filtering, not on the backend truncating).
 BACKEND_MAX_ELEMENTS = 2000

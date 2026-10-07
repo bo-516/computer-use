@@ -67,6 +67,14 @@ def test_annotations_match_the_contract() -> None:
         assert hints == EXPECTED_HINTS[tool.name], tool.name
 
 
+def test_wait_for_schema_advertises_enabled_and_title() -> None:
+    assert [tool.name for tool in TOOLS] == PUBLIC_TOOLS
+    wait = next(tool for tool in tool_definitions() if tool.name == "wait_for")
+    props = cast(dict[str, object], wait.input_schema["properties"])
+    assert "enabled" in props and "title" in props
+    assert "text" in props and "ref_role" in props and "gone" in props
+
+
 def test_schemas_are_self_contained_objects() -> None:
     for tool in tool_definitions():
         assert tool.input_schema.get("type") == "object"

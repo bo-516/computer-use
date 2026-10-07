@@ -15,8 +15,10 @@ from ..models.outputs import ActionResult, HitOut
 from ..observe.diff import (
     WindowContext,
     cap_changes,
+    dialog_changes,
     element_changes,
     summarize,
+    text_changes,
     window_changes,
 )
 from ..session import Observation
@@ -81,6 +83,8 @@ async def finish(ctx: FacadeContext, prep: Prepared, *, action: str, target: str
     after = built.obs
     changes = window_changes(_context(prep.obs), _context(after))
     changes += element_changes(prep.obs.elements, after.elements)
+    changes += text_changes(prep.obs.elements, after.elements)
+    changes += dialog_changes(prep.obs.elements, after.elements)
     capped = cap_changes(changes, ACTION_SUMMARY_MAX_BYTES, reserve=RESULT_OVERHEAD_BYTES)
     summary = summarize(action, target, capped)
     ctx.state.write(after)

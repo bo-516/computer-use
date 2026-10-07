@@ -50,12 +50,19 @@ def _flatten(raw: object, nodes: dict[str, FakeNode], counter: list[int]) -> str
     children = [_flatten(child, nodes, counter)
                 for child in cast(list[object], item.get("children") or [])]
     value = item.get("value")
+    expanded = item.get("expanded")
+    placeholder = item.get("placeholder", item.get("placeholder_value"))
     nodes[node_id] = FakeNode(
         id=node_id, role=str(item.get("role", "group")), label=str(item.get("label", "")),
         value=None if value is None else str(value), frame=_rect(item.get("frame")),
         subrole=str(item.get("subrole", "")), enabled=item.get("enabled", True) is not False,
         visible=item.get("visible", True) is not False, children=children,
-        on_click=_str_list(item.get("on_click")), on_enter=_str_list(item.get("on_enter")))
+        on_click=_str_list(item.get("on_click")), on_enter=_str_list(item.get("on_enter")),
+        # V17: only a present key is stored. Missing keys stay None.
+        expanded=expanded if isinstance(expanded, bool) else None,
+        min_value=_num(item.get("min_value", item.get("min", item.get("minimum")))),
+        max_value=_num(item.get("max_value", item.get("max", item.get("maximum")))),
+        placeholder=placeholder if isinstance(placeholder, str) else None)
     return node_id
 
 

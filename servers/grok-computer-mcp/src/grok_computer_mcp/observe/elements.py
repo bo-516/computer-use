@@ -32,3 +32,10 @@ class ObservedElement:
     selected: bool | None
     parent_ref: str | None
     depth: int
+    # V17: absent when the backend omits them. The renderer then keeps today's line.
+    expanded: bool | None = None
+    min_value: float | None = None
+    max_value: float | None = None
+    placeholder: str | None = None
+    # Derived at build time (refactor FR-12). Not written to the state file.
+    hidden_text: bool = False
